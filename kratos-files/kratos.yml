@@ -1,0 +1,15 @@
+identity:
+  default_schema_url: file:///etc/config/kratos/movie-polls-user.schema.json
+
+selfservice:
+  methods:
+    password: # form of authentication
+      enabled: true
+
+hashers:
+  argon2:
+    parallelism: 1
+    memory: 131072 # 128MB
+    iterations: 3
+    salt_length: 16
+    key_length: 32
