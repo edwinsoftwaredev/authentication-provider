@@ -32,6 +32,7 @@ services:
     restart: unless-stopped
     environment: 
       - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/MoviePollsDb?max_conns=20&max_idle_conns=4
+      - COURIER_SMTP_CONNECTION_URI=smtps://${MAILTRAP_USER}:${MAILTRAP_PASS}@smtp.mailtrap.io:2525/?skip_ssl_verify=false
     volumes: 
       - ./kratos-files:/etc/config/kratos
     command:
