@@ -5,6 +5,9 @@ serve:
     base_url: http://127.0.0.1:4433/
     cors:
       enabled: true
+      allowed_origins:
+        - http://127.0.0.1:4455
+
   admin:
     base_url: http://127.0.0.1:4434/
 
@@ -14,13 +17,13 @@ identity:
 selfservice:
   flows:
     login:
-      ui_url: http://localhost:4455/auth/login
+      ui_url: http://127.0.0.1:4455/auth/login
   methods:
     password: # form of authentication
       enabled: true
-  default_browser_return_url: http://localhost:4455/ # this is the same. It is just for testing purpose.
+  default_browser_return_url: http://127.0.0.1:4455/ # this is the same. It is just for testing purpose.
   whitelisted_return_urls:
-    - http://localhost:4455/
+    - http://127.0.0.1:4455/
 
 hashers:
   argon2:
