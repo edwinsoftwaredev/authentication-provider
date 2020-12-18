@@ -23,11 +23,8 @@ function App() {
               >
                 Learn React
               </a>
-              <a
-                href="http://127.0.0.1:4433/self-service/login/browser"
-              >
-                Sign In
-              </a>
+              <a href={process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN ?? '/'}>Sign In</a>
+              <a href={process.env.REACT_APP_KRATOS_SELF_SERVICE_REGISTRATION ?? '/'}>Sign Up</a>
             </header>
           </Route>
           <Route path='/auth'>
