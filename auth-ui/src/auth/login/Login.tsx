@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import {Configuration, LoginFlow, PublicApi} from '@oryd/kratos-client'
 import LoginStyle from './Login.module.scss';
-import Axios from 'axios'
 
 const Login: React.FC = () => {
   const [flowId, setFlowId] = useState<string | null>();
@@ -32,7 +31,6 @@ const Login: React.FC = () => {
 
     if (flowId) {
       getLoginFlow();
-      console.log(loginFlow);
     }
   }, [flowId]);
 
