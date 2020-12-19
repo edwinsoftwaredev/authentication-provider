@@ -83,11 +83,12 @@ const Login: React.FC = () => {
           {
             flowMessages ? <div>{flowMessages.join(', ')}</div> : null
           }
-          <input
+          <button
             className={LoginStyle['btn-login']}
             type='submit'
-            value='Sign In'
-          />
+          >
+            Sign In
+          </button>
         </div>
       </form>
     </div>
