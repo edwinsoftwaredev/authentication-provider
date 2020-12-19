@@ -1,0 +1,28 @@
+.registration-component {
+  padding: 10px;
+  width: 25%;
+
+  .registration-form {
+    width: 100%;
+
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+
+      input {
+        margin: 5px 0;
+        font-size: 15pt;
+        line-height: 35px;
+      }
+
+      button {
+        margin: 10px 0;
+        width: 100%;
+        font-size: 17pt;
+        line-height: 35px;
+        background-color: transparent;
+        border: 1px solid black;
+      }
+    }
+  }
+}
