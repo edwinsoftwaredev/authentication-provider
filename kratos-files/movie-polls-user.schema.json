@@ -9,30 +9,48 @@
       "properties": {
         "username": {
           "type": "string",
+          "title": "Username",
+          "minLength": 6,
           "ory.sh/kratos": {
             "credentials": {
               "password": {
                 "identifier": true
               }
             }
+          },
+          "verification": {
+            "via": "email"
+          },
+          "recovery": {
+            "via": "email"
           }
+
         },
         "email": {
           "type": "string",
           "format": "email",
+          "title": "E-Mail",
+          "minLength": 3,
           "ory.sh/kratos": {
             "credentials": {
               "password": {
                 "identifier": true
               }
             }
+          },
+          "verification": {
+            "via": "email"
+          },
+          "recovery": {
+            "via": "email"
           }
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "Name"
         }
       },
-      "required": ["email", "name"],
+      "required": ["username", "email", "name"],
       "additionalProperties": false
     }
   }
