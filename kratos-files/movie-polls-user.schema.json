@@ -17,14 +17,7 @@
                 "identifier": true
               }
             }
-          },
-          "verification": {
-            "via": "email"
-          },
-          "recovery": {
-            "via": "email"
           }
-
         },
         "email": {
           "type": "string",
@@ -36,13 +29,13 @@
               "password": {
                 "identifier": true
               }
+            },
+            "verification": {
+              "via": "email"
+            },
+            "recovery": {
+              "via": "email"
             }
-          },
-          "verification": {
-            "via": "email"
-          },
-          "recovery": {
-            "via": "email"
           }
         },
         "name": {
