@@ -3,6 +3,7 @@ import {Route, Switch, useLocation} from 'react-router-dom'
 import Login from './login/Login';
 import AuthStyle from './Auth.module.scss';
 import Registration from './registration/Registration';
+import Verification from './verification/Verification';
 
 const Auth: React.FC = () => {
   const location = useLocation();
@@ -21,6 +22,9 @@ const Auth: React.FC = () => {
         </Route>
         <Route exact path='/auth/registration'>
           <Registration />
+        </Route>
+        <Route exact path='/auth/verify'>
+          <Verification />
         </Route>
       </Switch>
     </div>
