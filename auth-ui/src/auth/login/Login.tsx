@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import {Configuration, LoginFlow, PublicApi} from '@oryd/kratos-client'
 import LoginStyle from './Login.module.scss';
+import ValidatedTextInput from '../../shared/validated-input/ValidatedTextInput'
 
 const Login: React.FC = () => {
   const [flowId, setFlowId] = useState<string | null>();
@@ -59,26 +60,24 @@ const Login: React.FC = () => {
             value={csrfToken}
             required
           />
-          <input 
-            className={LoginStyle['field-username']}
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = usernameMessages ?? [''];
+              setInputMessage(messages.join(', '), !messages);
+            }}
             name='identifier'
-            placeholder='Username'
-            type='text' 
-            autoComplete='off'
+            others={{fieldname: 'Username', autoComplete: 'off'}}
           />
-          {
-            usernameMessages ? <div>{usernameMessages.join(', ')}</div> : null
-          }
-          <input
-            className={LoginStyle['field-password']}
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = passwordMessages ?? [''];
+              setInputMessage(messages.join(', '), !messages);
+            }}
             name='password'
-            placeholder='Password'
-            type='password'
-            autoComplete='off'
+            others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
           />
-          {
-            passwordMessages ? <div>{passwordMessages.join(', ')}</div> : null
-          }
           <br />
           {
             flowMessages ? <div>{flowMessages.join(', ')}</div> : null
