@@ -6,6 +6,7 @@ const ValidatedTextInput: React.FC<IValidatedTextInput> = (props: any) => {
   const [isTouched, setIsTouched] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [message, setMessage] = useState('');
+  const [value, setValue] = useState('');
 
   /*const textHandler = (value: string) => {
     setIsTouched(true);
@@ -20,10 +21,11 @@ const ValidatedTextInput: React.FC<IValidatedTextInput> = (props: any) => {
 
   // after props changes this useEffect is going to be executed!
   useEffect(() => {
-    props.initialState((message: string, isValid: boolean) => {
+    props.initialState((message: string, isValid: boolean, value: string) => {
       setMessage(message);
       setIsValid(isValid);
       setIsTouched(!!message);
+      setValue(value);
     }); 
   }, [props]);
 
@@ -52,8 +54,10 @@ const ValidatedTextInput: React.FC<IValidatedTextInput> = (props: any) => {
             setIsValid(true);
             setIsTouched(true);
             setMessage('');
+            setValue(event.target.value)
           }
         }
+        value={value}
         {...props.others}
       />
     </div>
@@ -63,7 +67,7 @@ const ValidatedTextInput: React.FC<IValidatedTextInput> = (props: any) => {
 export interface IValidatedTextInput {
   value: (value: string) => void;
   // isValid: (value: string, setMessage: (message: string) => void) => boolean;
-  initialState: (setInputState: (message: string, isValid: boolean) => void) => void;
+  initialState: (setInputState: (message: string, isValid: boolean, value: string) => void) => void;
   name: string;
   others: object;
 }
