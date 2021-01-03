@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import RegistrationStyle from './Registration.module.scss';
 import {Configuration, PublicApi, RegistrationFlow} from '@oryd/kratos-client';
 import { useLocation } from 'react-router-dom';
+import ValidatedTextInput from '../../shared/validated-input/ValidatedTextInput';
 
 const Registration: React.FC = () => {
   const [flowId, setFlowId] = useState<string>('');
@@ -12,6 +13,10 @@ const Registration: React.FC = () => {
   const [passwordMessages, setPasswordMessages] =  useState<(string | undefined)[] | undefined>();
   const [nameMessages, setNameMessages] =  useState<(string | undefined)[] | undefined>();
   const [action, setAction] = useState<string>('');
+
+  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [name, setName] = useState<string>('');
 
   const location = useLocation();
 
@@ -37,6 +42,31 @@ const Registration: React.FC = () => {
     if (registrationFlow) {
       setCsrfToken((registrationFlow.methods.password.config.fields[0].value ?? '') as string);
       setAction(registrationFlow.methods.password.config.action);
+      const usernameTemp = registrationFlow
+        .methods
+        .password
+        .config
+        .fields
+        .find(field => field.name === 'traits.username')
+        ?.value;
+      
+      setUsername(usernameTemp ? usernameTemp.toString() : '');
+      const emailTemp = registrationFlow
+        .methods
+        .password
+        .config
+        .fields
+        .find(field => field.name === 'traits.email')
+        ?.value;
+      setEmail(emailTemp ? emailTemp.toString() : '');
+      const nameTemp = registrationFlow
+        .methods
+        .password
+        .config
+        .fields
+        .find(field => field.name === 'traits.name')
+        ?.value;
+      setName(nameTemp ? nameTemp.toString() : '');
       setPasswordMessages(
         registrationFlow
           .methods
@@ -96,46 +126,42 @@ const Registration: React.FC = () => {
             value={csrfToken}
             required
           />
-          <input
-            className={RegistrationStyle['form-field']}
-            type='email'
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = emailMessages ?? [''];
+              setInputMessage(messages.join(', '), !messages, email);
+            }}
             name='traits.email'
-            autoComplete='off'
-            placeholder='E-Mail'
+            others={{fieldname: 'E-Mail', autoComplete: 'off'}}
           />
-          {
-            emailMessages ? <div>{emailMessages.join(', ')}</div> : null
-          }
-          <input
-            className={RegistrationStyle['form-field']}
-            type='text'
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = usernameMessages ?? [''];
+              setInputMessage(messages.join(', '), !messages, username);
+            }}
             name='traits.username'
-            autoComplete='off'
-            placeholder='Username' 
+            others={{fieldname: 'Username', autoComplete: 'off'}}
           />
-          {
-              usernameMessages ? <div>{usernameMessages.join(', ')}</div> : null
-          }
-          <input
-            className={RegistrationStyle['form-field']}
-            type='text'
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = nameMessages ?? [''];
+              setInputMessage(messages.join(', '), !messages, name);
+            }}
             name='traits.name'
-            placeholder='Name'
-            autoComplete='off' 
+            others={{fieldname: 'Name', autoComplete: 'off'}}
           />
-          {
-            nameMessages ? <div>{nameMessages.join(', ')}</div> : null
-          }
-          <input
-            className={RegistrationStyle['form-field']}
-            type='password'
+          <ValidatedTextInput 
+            value={value => null}
+            initialState={(setInputMessage) => {
+              const messages = passwordMessages ?? [''];
+              setInputMessage(messages.join('') ? ': ' + messages.join(', ') : '', !messages, '');
+            }}
             name='password'
-            placeholder='Password'
-            required
+            others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
           />
-          {
-            passwordMessages ? <div>{passwordMessages.join(', ')}</div> : null
-          }
           <button
             className={RegistrationStyle['btn-submit']}
             type='submit'
