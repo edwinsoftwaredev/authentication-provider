@@ -9,6 +9,7 @@ const Login: React.FC = () => {
   const [loginFlow, setLoginFlow] = useState<LoginFlow>();
   const [csrfToken, setCsrfToken] = useState<string>('');
   const [action, setAction] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
   const [usernameMessages, setUsernameMessages] = useState<(string | undefined)[] | undefined>();
   const [passwordMessages, setPasswordMessages] = useState<(string | undefined)[] | undefined>();
   const [flowMessages, setFlowMessages] = useState<(string | undefined)[] | undefined>();
@@ -39,6 +40,7 @@ const Login: React.FC = () => {
     if (loginFlow) {
       setCsrfToken((loginFlow.methods.password.config.fields[2].value as object).toString());
       setAction(loginFlow.methods.password.config.action as string);
+      setUsername((loginFlow.methods.password.config.fields[0].value as Object).toString());
       setUsernameMessages(loginFlow.methods.password.config.fields[0].messages?.map(value => value.text));
       setPasswordMessages(loginFlow.methods.password.config.fields[1].messages?.map(value => value.text));
       setFlowMessages(loginFlow.methods.password.config.messages?.map(value => value.text));
@@ -64,7 +66,7 @@ const Login: React.FC = () => {
             value={value => null}
             initialState={(setInputMessage) => {
               const messages = usernameMessages ?? [''];
-              setInputMessage(messages.join(', '), !messages);
+              setInputMessage(messages.join(', '), !messages, username);
             }}
             name='identifier'
             others={{fieldname: 'Username', autoComplete: 'off'}}
@@ -73,7 +75,7 @@ const Login: React.FC = () => {
             value={value => null}
             initialState={(setInputMessage) => {
               const messages = passwordMessages ?? [''];
-              setInputMessage(messages.join(', '), !messages);
+              setInputMessage(messages.join(', '), !messages, '');
             }}
             name='password'
             others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
