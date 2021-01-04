@@ -1,0 +1,58 @@
+.alert-message-container {
+    display: flex;
+    flex-direction: row;
+
+    * {
+        animation-duration: 700ms;
+        animation-name: initializing;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease-in;
+    }
+
+    &.error {
+        border: 1px solid red;
+        animation-duration: 700ms;
+        animation-name: initializing;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease-in;
+    }
+
+    .message {
+        font-size: 1.4em;
+        padding: 0.3em;
+        text-align: center;
+    }
+
+    .right-container {
+        display: flex;
+        border-left: 1px solid red;
+
+        .close-button {
+            height: 100%;
+            margin: 0;
+            font-size: 1.7em;
+            font-weight: 700;
+            color: red;
+            border: none;
+            outline: none;
+            background-color: rgb(255, 181, 181);
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+@keyframes initializing {
+    0% {
+        border-color: transparent;
+        background-color: transparent;
+        color: transparent;
+    }
+
+    100% {
+        border-color: red;
+        color: red;
+    }
+}
