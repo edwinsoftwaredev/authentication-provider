@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import {Configuration, LoginFlow, PublicApi} from '@oryd/kratos-client'
 import LoginStyle from './Login.module.scss';
 import ValidatedTextInput from '../../shared/validated-input/ValidatedTextInput'
+import AlertMessage from '../../shared/alert-message/AlertMessage';
 
 const Login: React.FC = () => {
   const [flowId, setFlowId] = useState<string | null>();
@@ -80,9 +81,8 @@ const Login: React.FC = () => {
             name='password'
             others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
           />
-          <br />
           {
-            flowMessages ? <div>{flowMessages.join(', ')}</div> : null
+            flowMessages ? <AlertMessage message={flowMessages.join(', ')} type={'error'}/> : null
           }
           <button
             className={LoginStyle['btn-login']}

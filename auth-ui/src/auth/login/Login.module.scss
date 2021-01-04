@@ -9,16 +9,25 @@
       display: flex;
       flex-direction: column;
 
-      button {
+      .btn-login {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
           'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
           sans-serif;
         margin: 10px 0;
         width: 100%;
-        font-size: 17pt;
+        font-weight: 500;
+        font-size: 1.6em;
         line-height: 35px;
         background-color: transparent;
-        border: 1px solid black;
+        border: 1px solid slategray;
+        color: darkslategray;
+        transition: background-color 300ms;
+        outline: none;
+
+        &:hover {
+          cursor: pointer;
+          background-color: rgb(238, 238, 238);
+        }
       }
     }
   }
