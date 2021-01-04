@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import {Configuration, LoginFlow, PublicApi} from '@oryd/kratos-client'
-import LoginStyle from './Login.module.scss';
+import style from './Login.module.scss';
 import ValidatedTextInput from '../../shared/validated-input/ValidatedTextInput'
 import AlertMessage from '../../shared/alert-message/AlertMessage';
+import Button from '../../shared/button/button';
 
 const Login: React.FC = () => {
   const [flowId, setFlowId] = useState<string | null>();
@@ -16,6 +17,12 @@ const Login: React.FC = () => {
   const [flowMessages, setFlowMessages] = useState<(string | undefined)[] | undefined>();
   const location = useLocation();
 
+  const handleSignUpClick = (e: any) => {
+    const redir = process.env.REACT_APP_KRATOS_SELF_SERVICE_REGISTRATION; 
+    if (redir) {
+      window.location.href = redir;
+    }
+  }
 
   useEffect(() => {
     setFlowId(new URLSearchParams(location.search).get('flow'));
@@ -49,14 +56,14 @@ const Login: React.FC = () => {
   }, [loginFlow]);
 
   return (
-    <div className={LoginStyle['login-component']}>
+    <div className={style['login-component']}>
       <form 
-        className={LoginStyle['login-form']} 
+        className={style['login-form']} 
         action={action}
         method='POST'
         encType="application/x-www-urlencoded"
       >
-        <div className={LoginStyle['form-fields']}>
+        <div className={style['form-fields']}>
           <input 
             type='hidden'
             name='csrf_token'
@@ -84,12 +91,19 @@ const Login: React.FC = () => {
           {
             flowMessages ? <AlertMessage message={flowMessages.join(', ')} type={'error'}/> : null
           }
-          <button
-            className={LoginStyle['btn-login']}
-            type='submit'
-          >
-            Sign In
-          </button>
+          <div className={style['auth-buttons']}>
+            <Button 
+              classType={'default'}
+              text={'Sign In'}
+              type='submit'
+            />
+            <Button 
+              classType={'default'}
+              text={'Create New Account'}
+              type='button'
+              onClick={handleSignUpClick}
+            />
+          </div>
         </div>
       </form>
     </div>
