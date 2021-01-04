@@ -1,5 +1,8 @@
+@import './shared/style/globals.scss';
+
 .App {
   text-align: center;
+  background-color: $background-color;
 }
 
 .App-logo {
