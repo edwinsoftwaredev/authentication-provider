@@ -1,0 +1,27 @@
+@import '../style/globals.scss';
+
+.button {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    width: 100%;
+    font-weight: 700;
+    font-size: 1.3em;
+    line-height: 35px;
+    background-color: transparent;
+    border: 1px solid slategray;
+    color: slategray;
+    transition: background-color 300ms;
+    outline: none;
+
+    &:hover {
+        cursor: pointer;
+        color: darken(slategray, 5%);
+        background-color: $button-bgcolor-hover;
+        border-color: darken(slategray, 5%);
+    }
+
+    &.default {
+
+    }
+}
