@@ -3,7 +3,7 @@
     flex-direction: row;
 
     * {
-        animation-duration: 700ms;
+        animation-duration: 250ms;
         animation-name: initializing;
         animation-fill-mode: forwards;
         animation-timing-function: ease-in;
@@ -11,7 +11,7 @@
 
     &.error {
         border: 1px solid red;
-        animation-duration: 700ms;
+        animation-duration: 250ms;
         animation-name: initializing;
         animation-fill-mode: forwards;
         animation-timing-function: ease-in;
