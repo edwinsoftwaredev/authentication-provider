@@ -12,6 +12,7 @@ serve:
     base_url: http://127.0.0.1:4434/
 
 identity:
+  # schemas might determine the access type of a user
   default_schema_url: file:///etc/config/kratos/movie-polls-user.schema.json
 
 selfservice:
