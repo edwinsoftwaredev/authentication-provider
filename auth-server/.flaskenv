@@ -1,0 +1,3 @@
+FLASK_APP=authserver
+FLASK_RUN_PORT=4455
+FLASK_ENV=development
