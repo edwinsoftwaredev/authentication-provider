@@ -3,4 +3,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    .auth-message {
+        font-size: 14pt;
+        color: darkslategray;
+        font-weight: 600;
+    }
 }
