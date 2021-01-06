@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import logo from './logo.svg';
 import AppStyle from './App.module.scss';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
 
 function App() {
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path !== '/auth' && path !== '/auth/login' && path !== '/auth/registration') {
+      window.location.href = '/auth';
+    }
+  }, []);
+
+  console.log();
+
   return (
     <div className={AppStyle['App']}>
       <Router>
