@@ -18,10 +18,38 @@ const Auth: React.FC = () => {
           // has validated addresses.
 
           if (response.data.active) {
-            console.info('User is valid. Hydra next steps should follow.');
+            /* 
+              If you use localhost, use localhost in all places.
+              If you use 127.0.0.1, 127.0.0.1 in all places.
+              If there is a mix cookie will not work properly.
+
+              withCredentials has to be set to true in order
+              to set the cookies and send the cookies to the server*/
+            
+            Axios.get(`${process.env.REACT_APP_AUTH_SERVER_CSRF}`, {withCredentials: true})
+              .then(res => {
+
+                const csrfToken = document
+                  .cookie
+                  .split('; ')
+                  .find(cookie => cookie.startsWith('auth-csrf-token'))
+                  ?.split('=')[1];
+
+                /**
+                 * here withCredential is set to true to tell the browser to send
+                 * the session cookie required by flask in order to find the session
+                 * which stores the csrf token. remember that csrf tokens have a life 
+                 * of a session.
+                */
+                Axios.post(`${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, {}, {
+                  withCredentials: true,
+                  headers: {'X-CSRFToken': csrfToken}
+                })
+                  .then(res => console.log(res));
+              });
           }
         }, (reason: any) => {
-          // window.location.href = process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN ?? '/';
+          window.location.href = process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN ?? '/';
         });
     }
   }, [location.pathname]);
