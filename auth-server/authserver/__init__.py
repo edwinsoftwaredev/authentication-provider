@@ -1,11 +1,18 @@
 import os
 
 from flask import Flask
+from flask_cors.extension import CORS
 from . import blueprints
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    # to generate truly random secrets use
+    # import secrets
+    # print(secrets.token_urlsafe(32))
+
+    # to use sessions the secret_key has to be set
+    # to generate csrf token sessions are required
     app.config.from_mapping(
         WTF_CSRF_SECRET_KEY=os.environ.get('WTF_CSRF_SECRET_KEY'),
         SECRET_KEY=os.environ.get('SECRET_KEY')
@@ -24,6 +31,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    CORS(app, origins=[os.environ.get('ALLOWED_ORIGIN')], supports_credentials=True)
     blueprints.init_app(app)
     
     return app
