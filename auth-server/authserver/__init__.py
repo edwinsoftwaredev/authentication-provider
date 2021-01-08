@@ -1,4 +1,6 @@
 import os
+import requests
+from requests.exceptions import ConnectionError, Timeout
 
 from flask import Flask
 from flask_cors.extension import CORS
@@ -34,4 +36,51 @@ def create_app(test_config=None):
     CORS(app, origins=[os.environ.get('ALLOWED_ORIGIN')], supports_credentials=True)
     blueprints.init_app(app)
     
+    create_client()
     return app
+
+
+def create_client():
+    try:
+        url = os.environ.get('HYDRA_ADMIN_SERVER')
+        r = requests.get(f'{url}/health/alive', timeout=5)
+        if r.status_code == 200:
+            rg = requests.get(f'{url}/clients')
+
+            if len(rg.json()) and rg.json()[0]['client_id'] == 'MoviePollsFirstPartyClient':
+                print('First Party Client Already Exists.')
+                return
+
+            headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+
+            auth_client = os.environ.get('ALLOWED_ORIGIN')
+
+            data = {
+                'client_id': 'MoviePollsFirstPartyClient',
+                'client_name': 'Movie Polls First Party Client',
+                'grant_types': ['authorization_code'],
+                'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
+                'response_types': ['code'],
+                'scopes': 'moviepollsapi,openid',
+                'post_logout_redirect_uris': [auth_client],
+                'redirect_uris': [f'{auth_client}/auth/codes'],
+                'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
+            }
+
+            rp = requests.post(
+                f'{url}/clients',
+                json = data,
+                headers = headers
+            )
+
+            if rp.status_code == 201:
+                print('First Party Client Created.')
+        
+    except ConnectionError:
+        print('Hydra server is unreachable.')
+    except Timeout:
+        print('Hydra did not return a response.')
+
