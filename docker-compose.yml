@@ -5,23 +5,26 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes: 
-      - /mysql-flaskapp/storage:/var/lib/mysql
+      - ./mysql-data:/var/lib/mysql
+      - ./database-scripts/init_database.sql:/docker-entrypoint-initdb.d/setup.sql
     environment: 
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     # instance should not be exposed
     ports:
       - 3306:3306
+  
   ory-kratos-migrate: # Instance to control migrations
     depends_on: 
       - mysql-instance
     image: oryd/kratos:latest
     environment: 
-      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/MoviePollsDb?max_conns=20&max_idle_conns=4
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KratosDb?max_conns=20&max_idle_conns=4
     volumes: 
       - ./kratos-files:/etc/config/kratos
     command: 
       -c /etc/config/kratos/kratos.yml migrate sql -e --yes
     restart: on-failure
+  
   ory-kratos:
     depends_on: 
       - ory-kratos-migrate
@@ -31,11 +34,41 @@ services:
       - "4434:4434" # admin
     restart: unless-stopped
     environment: 
-      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/MoviePollsDb?max_conns=20&max_idle_conns=4
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KratosDb?max_conns=20&max_idle_conns=4
       - COURIER_SMTP_CONNECTION_URI=smtp://${MAILTRAP_USER}:${MAILTRAP_PASS}@smtp.mailtrap.io:2525
       - COURIER_SMTP_FROM_ADDRESS=noreply@moviepolls.com
     volumes: 
       - ./kratos-files:/etc/config/kratos
     command:
       serve -c /etc/config/kratos/kratos.yml --dev
-    
+
+  ory-hydra-migrate:
+    depends_on: 
+      - mysql-instance
+      - ory-kratos-migrate
+    image: oryd/hydra:latest
+    environment: 
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/HydraDb?max_conns=20&max_idle_conns=4
+    volumes: 
+      - ./hydra-files:/etc/config/hydra
+    command:
+      migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    restart: on-failure
+
+  ory-hydra:
+    depends_on:
+      - mysql-instance
+      - ory-hydra-migrate
+    image: oryd/hydra:latest
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
+    environment: 
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/HydraDb?max_conns=20&max_idle_conns=4
+      - SECRETS_SYSTEM={HYDRA_SECRETS_SYSTEM}
+    volumes: 
+      - ./hydra-files:/etc/config/hydra
+    command:
+      serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http # allows insecure connections. see docs
+    restart: unless-stopped
