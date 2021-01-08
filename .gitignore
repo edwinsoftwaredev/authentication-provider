@@ -3,5 +3,8 @@ venv
 .env
 __pycache__
 
+# mysql-data
+mysql-data
+
 # general
 .vscode
