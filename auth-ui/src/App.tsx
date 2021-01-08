@@ -3,22 +3,19 @@ import logo from './logo.svg';
 import AppStyle from './App.module.scss';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
-import useCsrfToken from './shared/hooks/useCsrfToken';
 
 function App() {
-  const isCsrfToken = useCsrfToken();
-
   useEffect(() => {
     const path = window.location.pathname;
     if (
         path !== '/auth' &&
         path !== '/auth/login' &&
         path !== '/auth/registration' &&
-        isCsrfToken
+        path !== '/auth/verify'
     ) {    
       window.location.href = '/auth';
     }
-  }, [isCsrfToken]);
+  }, []);
 
   return (
     <div className={AppStyle['App']}>
