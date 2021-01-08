@@ -1,0 +1,16 @@
+serve:
+  admin:
+    cors:
+      allowed_origins:
+        - http://127.0.0.1:5000
+
+  public:
+    cors:
+      allowed_origins:
+        - http://127.0.0.1:3000
+
+urls:
+  login: http://127.0.0.1:4455/auth
+
+pkce:
+  enforced: true
