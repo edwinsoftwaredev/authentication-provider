@@ -6,26 +6,27 @@ const useCsrfToken = (props?: any) => {
 
   useEffect(() => {
     Axios.get(`${process.env.REACT_APP_AUTH_SERVER_CSRF}`, {withCredentials: true})
-      .then(res => {
-        const cookieName = 'auth-csrf-token';
+    .then(res => {
+      const cookieName = 'auth-csrf-token';
 
-        const csrfToken = document
-          .cookie
-          .split('; ')
-          .find(cookie => cookie.startsWith(cookieName))
-          ?.split('=')[1];
-  
-        if (csrfToken) {
-          Axios.interceptors.request.use((request: AxiosRequestConfig) => {
-            request.headers['X-CSRFToken'] = csrfToken;
-            return request;
-          });
-          
-          setIsCsrfToken(true);
-        } else {
-          setIsCsrfToken(false);
-        }
-      });
+      // this token has to be saved in localstorage
+      const csrfToken = document
+        .cookie
+        .split('; ')
+        .find(cookie => cookie.startsWith(cookieName))
+        ?.split('=')[1];
+
+      if (csrfToken) {
+        Axios.interceptors.request.use((request: AxiosRequestConfig) => {
+          request.headers['X-CSRFToken'] = csrfToken;
+          return request;
+        });
+        
+        setIsCsrfToken(true);
+      } else {
+        setIsCsrfToken(false);
+      }
+    });
   }, []);
 
   return isCsrfToken;
