@@ -21,9 +21,13 @@ const useWhoAmI = (props?: IWhoAmI) => {
         {withCredentials: true}
       ).then((res: AxiosResponse) => {
         setResponse(res);
-      }, (reason: any) => {
-        window.location.href = process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN ?? '/';
-      });      
+      }, reason => {
+        // read this:
+        // https://www.ory.sh/kratos/docs/concepts/browser-redirect-flow-completion#redirection
+
+        window.location.href = `${process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN}` +
+          `?return_to=${window.location.href}` ?? '/';
+      });   
     }
   }, [location.pathname]);
 
