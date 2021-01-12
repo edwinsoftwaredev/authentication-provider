@@ -11,6 +11,7 @@ function App() {
         path !== '/auth' &&
         path !== '/auth/login' &&
         path !== '/auth/registration' &&
+        path !== '/auth/codes' &&
         path !== '/auth/verify'
     ) {    
       window.location.href = '/auth';
