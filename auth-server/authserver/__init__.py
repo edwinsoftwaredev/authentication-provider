@@ -47,7 +47,7 @@ def create_client():
         if r.status_code == 200:
             rg = requests.get(f'{url}/clients')
 
-            if len(rg.json()) and rg.json()[0]['client_id'] == 'MoviePollsFirstPartyClient':
+            if rg.json() and rg.json()[0]['client_id'] == 'MoviePollsFirstPartyClient':
                 print('First Party Client Already Exists.')
                 return
 
@@ -64,7 +64,7 @@ def create_client():
                 'grant_types': ['authorization_code'],
                 'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
                 'response_types': ['code'],
-                'scopes': 'moviepollsapi,openid',
+                'scope': 'openid moviepolls.users',
                 'post_logout_redirect_uris': [auth_client],
                 'redirect_uris': [f'{auth_client}/auth/codes'],
                 'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
@@ -72,8 +72,8 @@ def create_client():
 
             rp = requests.post(
                 f'{url}/clients',
-                json = data,
-                headers = headers
+                json=data,
+                headers=headers
             )
 
             if rp.status_code == 201:
