@@ -25,6 +25,7 @@ const useWhoAmI = (props?: IWhoAmI) => {
         // read this:
         // https://www.ory.sh/kratos/docs/concepts/browser-redirect-flow-completion#redirection
 
+        // check first if there is a login_challenge parameter
         window.location.href = `${process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN}` +
           `?return_to=${window.location.href}` ?? '/';
       });   
