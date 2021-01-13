@@ -30,10 +30,12 @@ const Auth: React.FC = () => {
          * of a session.
         */
         const urlSearch = new URLSearchParams(location.search);
-        console.log(urlSearch.get('login_challenge'));
+        const loginChallenge = urlSearch.get('login_challenge');
         Axios.post(
           `${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, 
-          {},
+          {
+            loginChallenge: loginChallenge
+          },
           {withCredentials: true}
         )
         .then(res => console.log(res));
