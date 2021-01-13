@@ -1,7 +1,8 @@
 import logging
 import os
 
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, redirect, jsonify
+from ory_hydra_client.api.admin_api import AdminApi
 from ory_hydra_client.models.login_request import LoginRequest
 from ory_hydra_client.rest import ApiException
 import ory_hydra_client
@@ -12,6 +13,18 @@ bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @bp.route('/challenge', methods=['POST'])
 def login_challenge():
+    def reject_login_request(api_instance: AdminApi, login_challenge):
+        # this function has to be tested
+        body = ory_hydra_client.RejectRequest()
+        api_response = api_instance.reject_login_request(login_challenge, body=body)
+        return {'redirectUrl': api_response.redirect_to}
+
+    def accept_login_request(api_instance: AdminApi, login_challenge, subject):
+        # subject must be equal to the user's id genereted by ory kratos
+        body = ory_hydra_client.AcceptLoginRequest(subject=subject)
+        api_response = api_instance.accept_login_request(login_challenge, body=body)
+        return {'redirectUrl': api_response.redirect_to}
+
     req_json = request.get_json()
     configuration = ory_hydra_client.Configuration(
         os.environ.get('HYDRA_ADMIN_SERVER')
@@ -19,6 +32,9 @@ def login_challenge():
 
     try:
         login_challenge=req_json['loginChallenge']
+        if not login_challenge:
+            abort(400)
+
         with ory_hydra_client.ApiClient(configuration) as api_client:
             api_instance = ory_hydra_client.AdminApi(api_client)
             response: LoginRequest = api_instance.get_login_request(login_challenge)
@@ -28,30 +44,27 @@ def login_challenge():
                 res_whoami = requests.get(f'{kratos_url}/sessions/whoami', cookies=request.cookies)
 
                 if res_whoami.status_code == 401:
-                    # reject login challenge <--
+                    reject_login_request(api_instance, login_challenge)
                     abort(401)
                 elif (res_whoami.json() and 
                     'active' in res_whoami.json() and
                     res_whoami.json()['active'] is True):
 
-                    # this id must be equal to id genereted by ory kratos
-                    body = ory_hydra_client.AcceptLoginRequest(subject=res_whoami.json()['identity']['id'])
-                    # api_response = api_instance.accept_login_request(login_challenge, body=body)
-                    print(body)
+                    subject = res_whoami.json()['identity']['id']
+                    return accept_login_request(api_instance, login_challenge, subject)
+
                 else:
-                    # reject login challenge <--
+                    reject_login_request(api_instance, login_challenge)
                     abort(401)
             else:
-                # reject login challenge <--
-                print('AAA')
+                reject_login_request(api_instance, login_challenge)
+                abort(401)
     except KeyError:
         logging.error('There was an error when trying to get value by key.')
         abort(400)
     except ApiException:
         logging.error('An ApiException occurred.')
         abort(400)
-
-    return 'It Works'
 
 @bp.route('/whoami', methods=['GET'])
 def whoami():
