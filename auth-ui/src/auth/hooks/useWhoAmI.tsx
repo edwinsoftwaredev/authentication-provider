@@ -17,7 +17,7 @@ const useWhoAmI = (props?: IWhoAmI) => {
       location.pathname !== '/auth/verify'
     ) {
       Axios.get(
-        `${process.env.REACT_APP_KRATOS_SERVER}sessions/whoami`,
+        `${process.env.REACT_APP_AUTH_SERVER_WHOAMI}`,
         {withCredentials: true}
       ).then((res: AxiosResponse) => {
         setResponse(res);
