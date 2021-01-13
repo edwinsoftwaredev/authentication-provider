@@ -8,6 +8,7 @@ serve:
       allowed_origins:
         - http://127.0.0.1:4455
         - http://127.0.0.1:3000
+        - http://127.0.0.1:5000
 
   admin:
     base_url: http://127.0.0.1:4434/
