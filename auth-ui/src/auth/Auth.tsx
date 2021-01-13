@@ -31,14 +31,17 @@ const Auth: React.FC = () => {
         */
         const urlSearch = new URLSearchParams(location.search);
         const loginChallenge = urlSearch.get('login_challenge');
-        Axios.post(
-          `${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, 
-          {
-            loginChallenge: loginChallenge
-          },
-          {withCredentials: true}
-        )
-        .then(res => console.log(res));
+
+        if (loginChallenge) {
+          Axios.post(
+            `${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, 
+            {
+              loginChallenge: loginChallenge
+            },
+            {withCredentials: true}
+          )
+          .then(res => window.location.href = res.data.redirectUrl);
+        }
       } 
     }
 
