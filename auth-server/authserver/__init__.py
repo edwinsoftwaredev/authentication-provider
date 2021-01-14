@@ -64,7 +64,7 @@ def create_client():
                 'grant_types': ['authorization_code'],
                 'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
                 'response_types': ['code'],
-                'scope': 'openid clientdemo.users',
+                'scope': 'openid clientdemo.demo',
                 'post_logout_redirect_uris': [auth_client],
                 'redirect_uris': [f'{auth_client}/auth/codes'],
                 'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
