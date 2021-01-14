@@ -62,7 +62,8 @@ def create_client():
                 'client_id': 'ClientDemo',
                 'client_name': 'ClientDemo',
                 'grant_types': ['authorization_code'],
-                'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
+                # check docs https://www.ory.sh/hydra/docs/guides/oauth2-public-spa-mobile
+                'token_endpoint_auth_method': 'none', 
                 'response_types': ['code'],
                 'scope': 'openid clientdemo.demo',
                 'post_logout_redirect_uris': [auth_client],
