@@ -11,10 +11,10 @@ serve:
       allowed_origins:
         - http://127.0.0.1:3000
 
-webfinger:
-  oidc_discovery:
-    supported_scope: # scopes clients MAY request
-      - moviepollsapi
+# webfinger:
+#  oidc_discovery:
+#    supported_scope: # scopes clients MAY request
+#      - moviepollsapi
 
 urls:
   login: http://127.0.0.1:4455/auth
