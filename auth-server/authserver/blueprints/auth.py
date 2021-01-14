@@ -9,9 +9,11 @@ import ory_hydra_client
 import requests
 from requests.exceptions import Timeout
 
+
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
-@bp.route('/challenge', methods=['POST'])
+
+@bp.route('/login-challenge', methods=['POST'])
 def login_challenge():
     def reject_login_request(api_instance: AdminApi, login_challenge):
         # this function has to be tested
@@ -65,6 +67,29 @@ def login_challenge():
     except ApiException:
         logging.error('An ApiException occurred.')
         abort(400)
+
+
+@bp.route('/consent-challenge', methods=['POST'])
+def consent_challenge():
+    def reject_consent_challenge():
+        pass
+
+    def accept_consent_challenge():
+        pass
+
+    req_json=request.get_json()
+    try:
+        consent_challenge=req_json['consentChallenge']
+
+        if not consent_challenge:
+            abort(400)
+
+        
+    except KeyError as key_error:
+        logging.error(f'There was an error when getting value by key in request body')
+    except ApiException as api_exception:
+        logging.error(f'An ApiException occured: {api_exception.reason}')
+
 
 @bp.route('/whoami', methods=['GET'])
 def whoami():
