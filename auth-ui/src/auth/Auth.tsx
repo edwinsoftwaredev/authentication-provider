@@ -1,63 +1,86 @@
-import React, { useEffect } from 'react';
-import {Route, Switch, useHistory, useLocation} from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import {Route, Switch, useLocation} from 'react-router-dom'
 import Login from './login/Login';
 import style from './Auth.module.scss';
 import Registration from './registration/Registration';
 import Verification from './verification/Verification';
 import Axios from 'axios';
 import useCsrfToken from '../shared/hooks/useCsrfToken';
-import useWhoAmI from './hooks/useWhoAmI';
+
+const redirectToLogin = () => {
+  window.location.href = `${process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN}` +
+  `?return_to=${window.location.href}` ?? '/';
+};
+
+const processLoginChallenge = (loginChallenge: string) => {
+  Axios.post(
+    `${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, 
+    {
+      loginChallenge: loginChallenge
+    },
+    {withCredentials: true}
+  )
+  .then(res => window.location.href = res.data.redirectUrl);
+};
+
+const processConsentChallenge = (consentChallege: string) => {
+
+};
 
 const Auth: React.FC = () => {
+  const [loginChallenge, setLoginChallenge] = useState<string| null>();
+  const [consentChallenge, setConsentChallenge] = useState<string | null>();
   const location = useLocation();
-  const history = useHistory()
   const isCsrfToken = useCsrfToken();
-  const whoAmI = useWhoAmI();
 
   useEffect(() => {
-    if (
-        location.pathname !== '/auth/login' &&
-        location.pathname !== '/auth/registration' &&
-        location.pathname !== '/auth/verify' &&
-        whoAmI &&
-        isCsrfToken
-    ) {
-      if (whoAmI.data.active) {
-        /**
-         * here withCredential is set to true to tell the browser to send
-         * the session cookie required by flask in order to find the session
-         * which stores the csrf token. remember that csrf tokens have a life 
-         * of a session.
-        */
-        const urlSearch = new URLSearchParams(location.search);
-        const loginChallenge = urlSearch.get('login_challenge');
+    const urlSearch = new URLSearchParams(location.search);
+    setLoginChallenge(urlSearch.get('login_challenge'));
+    setConsentChallenge(urlSearch.get('consent_challenge'));
+  }, [location.pathname, location.search]);
 
-        if (loginChallenge) {
-          Axios.post(
-            `${process.env.REACT_APP_AUTH_SERVER_LOGIN_CHALLENGE}`, 
-            {
-              loginChallenge: loginChallenge
-            },
-            {withCredentials: true}
-          )
-          .then(res => window.location.href = res.data.redirectUrl);
+  useEffect(() => {
+    if (location.pathname === '/auth' &&
+        isCsrfToken &&
+        (loginChallenge || consentChallenge)) {
+      Axios.get(
+        `${process.env.REACT_APP_AUTH_SERVER_WHOAMI}`,
+        {withCredentials: true}
+      ).then(res => {
+        if (res.data.active) {
+          if (loginChallenge) {
+            processLoginChallenge(loginChallenge);
+          }
+
+          if (consentChallenge) {
+            processConsentChallenge(consentChallenge);
+          }
+        } else {
+          console.log('User is not active');
         }
-      } 
+      }, reason => {
+        redirectToLogin();
+      });
     }
-
-    if (location.pathname === '/auth/verify') {
-      history.push('/auth');
-    }
-  }, [location.pathname, history, whoAmI, isCsrfToken, location.search]);
+  }, [loginChallenge, consentChallenge, isCsrfToken, location.pathname]);
 
   return (
     <div className={style['auth-component']}>
       {
         location.pathname !== '/auth/login' &&
         location.pathname !== '/auth/registration' &&
-        location.pathname !== '/auth/verify' ? (
+        location.pathname !== '/auth/verify' &&
+        (loginChallenge || consentChallenge) ? (
           <div className={style['auth-message']}>
             Validating Session...
+          </div>
+        ) : null
+      }
+      {
+        location.pathname === '/auth' && 
+        !(loginChallenge || consentChallenge) ? (
+          <div className={style['auth-message']}>
+            A challenge is required to continue. 
           </div>
         ) : null
       }

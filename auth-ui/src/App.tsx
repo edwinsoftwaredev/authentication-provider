@@ -10,6 +10,7 @@ function App() {
     if (
         path !== '/auth' &&
         path !== '/auth/login' &&
+        path !== '/auth/consent' &&
         path !== '/auth/registration' &&
         path !== '/auth/codes' &&
         path !== '/auth/verify'
