@@ -13,6 +13,9 @@ from requests.exceptions import Timeout
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 
+# with this functionality user must be always authenticated to be able to access apis
+
+
 @bp.route('/login-challenge', methods=['POST'])
 def login_challenge():
     def reject_login_request(api_instance: AdminApi, login_challenge):
@@ -39,25 +42,22 @@ def login_challenge():
 
         with ory_hydra_client.ApiClient(configuration) as api_client:
             api_instance = ory_hydra_client.AdminApi(api_client)
-            response: LoginRequest = api_instance.get_login_request(login_challenge)
-            client_scopes: str = response.client.scope.split(' ')
-            if 'moviepolls.users' in client_scopes:
-                kratos_url = os.environ.get('KRATOS_SERVER')
-                res_whoami = requests.get(f'{kratos_url}/sessions/whoami', cookies=request.cookies)
+            # the response has the property skip. 
+            # further information is in the documentation
+            # response: LoginRequest = api_instance.get_login_request(login_challenge)
+            kratos_url = os.environ.get('KRATOS_SERVER')
+            res_whoami = requests.get(f'{kratos_url}/sessions/whoami', cookies=request.cookies)
 
-                if res_whoami.status_code == 401:
-                    reject_login_request(api_instance, login_challenge)
-                    abort(401)
-                elif (res_whoami.json() and 
-                    'active' in res_whoami.json() and
-                    res_whoami.json()['active'] is True):
+            if res_whoami.status_code == 401:
+                reject_login_request(api_instance, login_challenge)
+                abort(401)
+            elif (res_whoami.json() and 
+                'active' in res_whoami.json() and
+                res_whoami.json()['active'] is True):
 
-                    subject = res_whoami.json()['identity']['id']
-                    return accept_login_request(api_instance, login_challenge, subject)
+                subject = res_whoami.json()['identity']['id']
+                return accept_login_request(api_instance, login_challenge, subject)
 
-                else:
-                    reject_login_request(api_instance, login_challenge)
-                    abort(401)
             else:
                 reject_login_request(api_instance, login_challenge)
                 abort(401)
