@@ -4,6 +4,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+    min-width: 8em !important;
     width: 100%;
     font-weight: 700;
     font-size: 1.3em;
@@ -23,5 +24,14 @@
 
     &.default {
 
+    }
+
+    &.contained {
+        background-color: lightseagreen;
+        color: white;
+
+        &:hover {
+            background-color: darkcyan;
+        }
     }
 }
