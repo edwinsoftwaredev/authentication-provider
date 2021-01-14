@@ -47,8 +47,8 @@ def create_client():
         if r.status_code == 200:
             rg = requests.get(f'{url}/clients')
 
-            if rg.json() and rg.json()[0]['client_id'] == 'MoviePollsFirstPartyClient':
-                print('First Party Client Already Exists.')
+            if rg.json() and rg.json()[0]['client_id'] == 'ClientDemo':
+                print('Client Already Exists.')
                 return
 
             headers = {
@@ -59,12 +59,12 @@ def create_client():
             auth_client = os.environ.get('ALLOWED_ORIGIN')
 
             data = {
-                'client_id': 'MoviePollsFirstPartyClient',
-                'client_name': 'Movie Polls First Party Client',
+                'client_id': 'ClientDemo',
+                'client_name': 'ClientDemo',
                 'grant_types': ['authorization_code'],
                 'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
                 'response_types': ['code'],
-                'scope': 'openid moviepolls.users',
+                'scope': 'openid clientdemo.users',
                 'post_logout_redirect_uris': [auth_client],
                 'redirect_uris': [f'{auth_client}/auth/codes'],
                 'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
@@ -77,7 +77,7 @@ def create_client():
             )
 
             if rp.status_code == 201:
-                print('First Party Client Created.')
+                print('Client Created.')
         
     except ConnectionError:
         print('Hydra server is unreachable.')
