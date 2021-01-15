@@ -1,4 +1,4 @@
-import {User as OidcUser, UserManager, UserManagerSettings} from 'oidc-client';
+import {SignoutResponse, User as OidcUser, UserManager, UserManagerSettings} from 'oidc-client';
 
 export default class AuthService {
   private static _instance: AuthService;
@@ -33,8 +33,16 @@ export default class AuthService {
     return this._userManager.signinRedirect()
   }
 
-  public async completeAuthentication(): Promise<OidcUser | void> {
+  public completeAuthentication(): Promise<OidcUser | void> {
     return this._userManager.signinRedirectCallback();
+  }
+
+  public startSignOut(): Promise<void> {
+    return this._userManager.signoutRedirect();
+  }
+
+  public completeSignOut(): Promise<SignoutResponse> {
+    return this._userManager.signoutRedirectCallback();
   }
 
   // ...
