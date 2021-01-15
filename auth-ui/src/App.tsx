@@ -13,7 +13,8 @@ function App() {
         path !== '/auth/consent' &&
         path !== '/auth/registration' &&
         path !== '/auth/codes' &&
-        path !== '/auth/verify'
+        path !== '/auth/verify' &&
+        path !== '/auth/logout'
     ) {    
       window.location.href = '/auth';
     }
