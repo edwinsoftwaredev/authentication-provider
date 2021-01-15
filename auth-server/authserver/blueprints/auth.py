@@ -74,8 +74,8 @@ def get_consent_request():
         api_response=api_instance.reject_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
-    def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str):
-        body = ory_hydra_client.AcceptConsentRequest()
+    def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str, requested_scope):
+        body = ory_hydra_client.AcceptConsentRequest(grant_scope=requested_scope)
         api_response = api_instance.accept_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
@@ -102,7 +102,8 @@ def get_consent_request():
                     'active' in res_whoami.json() and
                     res_whoami.json()['active'] is True):
 
-                    return accept_consent_challenge(api_instance, consent_challenge)
+                    requested_scope = api_response.requested_scope
+                    return accept_consent_challenge(api_instance, consent_challenge, requested_scope)
                 else:
                     return reject_consent_challenge(api_instance, consent_challenge)
 
@@ -132,8 +133,8 @@ def consent_challenge():
         api_response=api_instance.reject_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
-    def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str):
-        body = ory_hydra_client.AcceptConsentRequest()
+    def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str, requested_scope):
+        body = ory_hydra_client.AcceptConsentRequest(grant_scope=requested_scope)
         api_response = api_instance.accept_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
@@ -150,6 +151,7 @@ def consent_challenge():
 
         with ory_hydra_client.ApiClient(configuration) as api_client:
             api_instance=ory_hydra_client.AdminApi(api_client)
+            api_response=api_instance.get_consent_request(consent_challenge)
             kratos_url=os.environ.get('KRATOS_SERVER')
             res_whoami=requests.get(f'{kratos_url}/sessions/whoami', cookies=request.cookies)
 
@@ -159,7 +161,8 @@ def consent_challenge():
                 'active' in res_whoami.json() and
                 res_whoami.json()['active'] is True):
 
-                return accept_consent_challenge(api_instance, consent_challenge)
+                requested_scope=api_response.requested_scope
+                return accept_consent_challenge(api_instance, consent_challenge, requested_scope)
             else:
                 return reject_consent_challenge(api_instance, consent_challenge)
 
