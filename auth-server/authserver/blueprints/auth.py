@@ -26,7 +26,11 @@ def login_challenge():
 
     def accept_login_request(api_instance: AdminApi, login_challenge, subject):
         # subject must be equal to the user's id genereted by ory kratos
-        body = ory_hydra_client.AcceptLoginRequest(subject=subject)
+        # if remember is not set loging out may not work as expected!!!
+        body = ory_hydra_client.AcceptLoginRequest(
+            subject=subject,
+            remember=True,
+            remember_for=3600)
         api_response = api_instance.accept_login_request(login_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
@@ -198,7 +202,31 @@ def rjct_consent_challenge():
     except KeyError:
         logging.error(f'There was an error when getting value by key in request body')
     except ApiException as api_exception:
-        logging.error(f'An ApiException occured: {api_exception.reason}')
+        logging.error(f'An ApiException occurred: {api_exception.reason}')
+
+
+@bp.route('/logout-challenge', methods=['POST'])
+def logout_challenge():
+    req_json=request.get_json()
+    configuration=ory_hydra_client.Configuration(
+        os.environ.get('HYDRA_ADMIN_SERVER')
+    )
+
+    try:
+        logout_challenge=req_json['logoutChallenge']
+
+        if not logout_challenge:
+            abort(401)
+
+        with ory_hydra_client.ApiClient(configuration) as api_client:
+            api_instance=ory_hydra_client.AdminApi(api_client)
+            api_response=api_instance.accept_logout_request(logout_challenge)
+            return {'redirectUrl': api_response.redirect_to}
+
+    except KeyError:
+        logging.error('There was an error when getting value by key in request body')
+    except ApiException as api_exception:
+        logging.error(f'An ApiException occurred: {api_exception.reason}')
 
 
 @bp.route('/whoami', methods=['GET'])
