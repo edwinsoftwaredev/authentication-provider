@@ -6,8 +6,8 @@ const AuthCodes: React.FC = () => {
     const authService = AuthService.getInstance();
 
     authService.completeAuthentication().then(res => {
-      console.log(res);
-      console.log('Authentication Complete');
+      // console.log(res);
+      // console.log('Authentication Complete');
     });
   }, []);
 
