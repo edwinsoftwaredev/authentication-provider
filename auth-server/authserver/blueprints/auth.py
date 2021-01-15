@@ -122,9 +122,6 @@ def get_consent_request():
     except Exception:
         logging.error('There was an error in get_consent_request')
 
-    
-    return {'isTrue': True}
-
 
 @bp.route('/consent-challenge', methods=['POST'])
 def consent_challenge():
