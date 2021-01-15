@@ -56,7 +56,11 @@ def create_client():
                 'Accept': 'application/json'
             }
 
-            auth_client = os.environ.get('ALLOWED_ORIGIN')
+            # auth-server doesn't have to have any reference to any client in code
+            # this is just because this is a client seed to test the functionality
+            # of this project 
+            auth_client=os.environ.get('CLIENT_URL')
+            post_logout_redirect_url = f'{auth_client}/auth/logout'
 
             data = {
                 'client_id': 'ClientDemo',
@@ -66,7 +70,7 @@ def create_client():
                 'token_endpoint_auth_method': 'none', 
                 'response_types': ['code'],
                 'scope': 'openid clientdemo.demo',
-                'post_logout_redirect_uris': [auth_client],
+                'post_logout_redirect_uris': [post_logout_redirect_url],
                 'redirect_uris': [f'{auth_client}/auth/codes'],
                 'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
             }
