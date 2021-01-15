@@ -75,7 +75,10 @@ def get_consent_request():
         return {'redirectUrl': api_response.redirect_to}
 
     def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str, requested_scope):
-        body = ory_hydra_client.AcceptConsentRequest(grant_scope=requested_scope)
+        body=ory_hydra_client.AcceptConsentRequest(
+            grant_scope=requested_scope,
+            remember=True,
+            remember_for=3600)
         api_response = api_instance.accept_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
@@ -131,7 +134,10 @@ def consent_challenge():
         return {'redirectUrl': api_response.redirect_to}
 
     def accept_consent_challenge(api_instance: AdminApi, consent_challenge: str, requested_scope):
-        body = ory_hydra_client.AcceptConsentRequest(grant_scope=requested_scope)
+        body = ory_hydra_client.AcceptConsentRequest(
+            grant_scope=requested_scope,
+            remember=True,
+            remember_for=3600)
         api_response = api_instance.accept_consent_request(consent_challenge, body=body)
         return {'redirectUrl': api_response.redirect_to}
 
