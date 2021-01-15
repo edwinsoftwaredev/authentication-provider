@@ -24,9 +24,22 @@ const processLoginChallenge = (loginChallenge: string) => {
   .then(res => window.location.href = res.data.redirectUrl);
 };
 
+const processLogoutChallenge = (logoutChallege: string) => {
+  Axios.post(
+    `${process.env.REACT_APP_AUTH_SERVER_LOGOUT_CHALLENGE}`,
+    {
+      logoutChallenge: logoutChallege
+    },
+    {withCredentials: true}
+  ).then(res => {
+    window.location.href = res.data.redirectUrl;
+  });
+};
+
 const Auth: React.FC = () => {
   const [loginChallenge, setLoginChallenge] = useState<string| null>();
   const [consentChallenge, setConsentChallenge] = useState<string | null>();
+  const [logoutChallenge, setLogoutChallege] = useState<string | null>();
   const [userActive, setUserActive] = useState<boolean>(false);
   const location = useLocation();
   const isCsrfToken = useCsrfToken();
@@ -36,14 +49,16 @@ const Auth: React.FC = () => {
     const urlSearch = new URLSearchParams(location.search);
     setLoginChallenge(urlSearch.get('login_challenge'));
     setConsentChallenge(urlSearch.get('consent_challenge'));
+    setLogoutChallege(urlSearch.get('logout_challenge'));
   }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (
       isCsrfToken &&
       location.pathname === '/auth' &&
-      (loginChallenge || consentChallenge)
+      (loginChallenge || consentChallenge || logoutChallenge)
     ) {
+      // check if there is an active session in kratos 
       Axios.get(
         `${process.env.REACT_APP_AUTH_SERVER_WHOAMI}`,
         {withCredentials: true}
@@ -57,7 +72,8 @@ const Auth: React.FC = () => {
     isCsrfToken,
     location.pathname,
     loginChallenge,
-    consentChallenge
+    consentChallenge,
+    logoutChallenge
   ]);
 
   useEffect(() => {
@@ -65,6 +81,7 @@ const Auth: React.FC = () => {
       location.pathname === '/auth' &&
       isCsrfToken &&
       (loginChallenge || consentChallenge) &&
+      !logoutChallenge &&
       userActive
     ) {
       if (loginChallenge) {
@@ -92,11 +109,22 @@ const Auth: React.FC = () => {
   }, [
     loginChallenge,
     consentChallenge,
+    logoutChallenge,
     isCsrfToken,
     location.pathname,
     history,
     userActive
   ]);
+
+  useEffect(() => {
+    if (
+      location.pathname === '/auth' &&
+      isCsrfToken &&
+      logoutChallenge
+    ) {
+      processLogoutChallenge(logoutChallenge);
+    }
+  }, [logoutChallenge, isCsrfToken, location.pathname])
 
   return (
     <div className={style['auth-component']}>
@@ -106,7 +134,7 @@ const Auth: React.FC = () => {
         location.pathname !== '/auth/verify' &&
         location.pathname !== '/auth/codes' &&
         location.pathname !== '/auth/consent' &&
-        (loginChallenge || consentChallenge) ? (
+        (loginChallenge || consentChallenge || logoutChallenge) ? (
           <div className={style['auth-message']}>
             Validating Session...
           </div>
@@ -114,7 +142,7 @@ const Auth: React.FC = () => {
       }
       {
         location.pathname === '/auth' && 
-        !(loginChallenge || consentChallenge) ? (
+        !(loginChallenge || consentChallenge || logoutChallenge) ? (
           <div className={style['auth-message']}>
             A challenge is required to continue. 
           </div>
