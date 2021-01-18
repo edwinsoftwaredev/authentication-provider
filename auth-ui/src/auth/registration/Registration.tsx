@@ -130,6 +130,14 @@ const Registration: React.FC = () => {
 
   return (
     <div className={style['registration-component']}>
+      <div className={style['header']}>
+        <div className={style['title']}>
+          Authentication Provider
+        </div>
+        <div className={style['sub-title']}>
+          Sign Up
+        </div>
+      </div>
       <form 
         className={style['registration-form']}
         action={action}
