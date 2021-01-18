@@ -1,0 +1,16 @@
+.list {
+    list-style-type: none;
+    padding-inline-start: 0;
+
+    .item {
+        font-size: 2em;
+        font-weight: 600;
+        color: white;
+        line-height: 2.4em;
+
+        &:hover {
+            background-color: slategray;
+            cursor: pointer;
+        }
+    }
+}
