@@ -5,6 +5,8 @@ import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
 import useWhoAmI, { WhoAmIStatus } from './shared/hooks/useWhoAmI';
 import AppContext from './shared/context/app-context';
+import Menu from './shared/menu/Menu';
+import Button from './shared/button/button';
 
 const initialState = {
   isUserActive: WhoAmIStatus.NotFetched,
@@ -18,12 +20,15 @@ function App() {
     setGlobalState(state => ({...state, isUserActive: whoAmI}));
   }, [whoAmI]);
 
-  // the logout endpoint is not protected with a csrf token
-  // https://www.ory.sh/kratos/docs/self-service/flows/user-logout#self-service-user-logout-for-browser-applications
-  const handleLogout = () => {
-    const redir = process.env.REACT_APP_KRATOS_LOGOUT;
-    window.location.href =  redir ? redir + `?return_to=${window.location.href}` : '';
+  const handleLogin = () => {
+    const redir = process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN;
+    window.location.href = redir ? redir : '';
   }
+
+  const handleRegistration = () => {
+    const redir = process.env.REACT_APP_KRATOS_SELF_SERVICE_REGISTRATION;
+    window.location.href = redir ? redir : '';
+  };
 
   return (
     <AppContext.Provider value={globalState}>
@@ -31,33 +36,38 @@ function App() {
         <Router>
           <Switch>
             <Route exact path='/'>
-              <header className={AppStyle['App-header']}>
-                <img src={logo} className={AppStyle['App-logo']} alt="logo" />
-                <p>
-                  Edit <code>src/App.tsx</code> and save to reload.
-                </p>
-                <a
-                  className={AppStyle['App-link']}
-                  href="https://reactjs.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn React
-                </a>
+              <div className={AppStyle['app-container']}>
                 {
-                  whoAmI === WhoAmIStatus.NotAuthorized ? (
-                    <div>
-                      <a href={process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN ?? '/'}>Sign In</a>
-                      <br />
-                      <a href={process.env.REACT_APP_KRATOS_SELF_SERVICE_REGISTRATION ?? '/'}>Sign Up</a>
-                    </div>
-                  ) : (
-                    <div>
-                      <button onClick={handleLogout}>Sign Out</button>
-                    </div>
-                  )
+                  whoAmI === WhoAmIStatus.Active ? (
+                    <div className={AppStyle['menu']}>
+                    <Menu />
+                  </div>
+                  ) : null
                 }
-              </header>
+                <div className={AppStyle['app-content']}>
+                  <h1 className={AppStyle['app-title']}>
+                    Authentication Provider
+                  </h1>
+                  {
+                    whoAmI === WhoAmIStatus.NotAuthorized ? (
+                      <div className={AppStyle['auth-buttons']}>
+                        <Button 
+                          type='button' 
+                          text='Sign In'
+                          classType='default'
+                          onClick={handleLogin}
+                        />
+                        <Button
+                          type='button'
+                          text='Sign Up'
+                          classType='default'
+                          onClick={handleRegistration} 
+                        />
+                      </div>
+                    ) : null
+                  }
+                </div>
+              </div>
             </Route>
             <Route path='/auth'>
               <Auth />
