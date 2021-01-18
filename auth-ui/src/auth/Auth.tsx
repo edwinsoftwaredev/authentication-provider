@@ -120,27 +120,24 @@ const Auth: React.FC = () => {
 
   return (
     <div className={style['auth-component']}>
-      {
-        location.pathname !== '/auth/login' &&
-        location.pathname !== '/auth/registration' &&
-        location.pathname !== '/auth/verify' &&
-        location.pathname !== '/auth/codes' &&
-        location.pathname !== '/auth/consent' &&
-        (loginChallenge || consentChallenge || logoutChallenge) ? (
-          <div className={style['auth-message']}>
-            Validating Session...
-          </div>
-        ) : null
-      }
-      {
-        location.pathname === '/auth' && 
-        !(loginChallenge || consentChallenge || logoutChallenge || userActive) ? (
-          <div className={style['auth-message']}>
-            A challenge is required to continue. 
-          </div>
-        ) : null
-      }
       <Switch>
+        <Route exact path='/auth'>
+          {
+            (loginChallenge || consentChallenge || logoutChallenge) ? (
+              <div className={style['auth-message']}>
+                Validating Session...
+              </div>
+            ) : null
+          }
+          {
+            location.pathname === '/auth' && 
+            !(loginChallenge || consentChallenge || logoutChallenge || userActive) ? (
+              <div className={style['auth-message']}>
+                A challenge is required to continue. 
+              </div>
+            ) : null
+          }
+        </Route>
         <Route exact path='/auth/login'>
           <Login />
         </Route>
