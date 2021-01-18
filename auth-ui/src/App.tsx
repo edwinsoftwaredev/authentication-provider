@@ -6,18 +6,6 @@ import Auth from '../src/auth/Auth';
 
 function App() {
   useEffect(() => {
-    const path = window.location.pathname;
-    if (
-        path !== '/auth' &&
-        path !== '/auth/login' &&
-        path !== '/auth/consent' &&
-        path !== '/auth/registration' &&
-        path !== '/auth/codes' &&
-        path !== '/auth/verify' &&
-        path !== '/auth/logout'
-    ) {    
-      window.location.href = '/auth';
-    }
   }, []);
 
   return (
