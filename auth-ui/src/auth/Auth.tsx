@@ -80,15 +80,13 @@ const Auth: React.FC = () => {
     if (
       location.pathname === '/auth' &&
       isCsrfToken &&
-      (loginChallenge || consentChallenge) &&
-      !logoutChallenge &&
-      userActive
+      (loginChallenge || consentChallenge || logoutChallenge)
     ) {
-      if (loginChallenge) {
+      if (loginChallenge && userActive) {
         processLoginChallenge(loginChallenge);
       }
 
-      if (consentChallenge) {
+      if (consentChallenge && userActive) {
         Axios.get(
           `${process.env.REACT_APP_AUTH_SERVER_CONSENT_CHALLENGE}`,
           {
@@ -105,6 +103,10 @@ const Auth: React.FC = () => {
           }
         });
       }
+
+      if (logoutChallenge) {
+        processLogoutChallenge(logoutChallenge);
+      }
     }
   }, [
     loginChallenge,
@@ -115,16 +117,6 @@ const Auth: React.FC = () => {
     history,
     userActive
   ]);
-
-  useEffect(() => {
-    if (
-      location.pathname === '/auth' &&
-      isCsrfToken &&
-      logoutChallenge
-    ) {
-      processLogoutChallenge(logoutChallenge);
-    }
-  }, [logoutChallenge, isCsrfToken, location.pathname])
 
   return (
     <div className={style['auth-component']}>
@@ -142,7 +134,7 @@ const Auth: React.FC = () => {
       }
       {
         location.pathname === '/auth' && 
-        !(loginChallenge || consentChallenge || logoutChallenge) ? (
+        !(loginChallenge || consentChallenge || logoutChallenge || userActive) ? (
           <div className={style['auth-message']}>
             A challenge is required to continue. 
           </div>
