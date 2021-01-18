@@ -18,6 +18,13 @@ function App() {
     setGlobalState(state => ({...state, isUserActive: whoAmI}));
   }, [whoAmI]);
 
+  // the logout endpoint is not protected with a csrf token
+  // https://www.ory.sh/kratos/docs/self-service/flows/user-logout#self-service-user-logout-for-browser-applications
+  const handleLogout = () => {
+    const redir = process.env.REACT_APP_KRATOS_LOGOUT;
+    window.location.href =  redir ? redir + `?return_to=${window.location.href}` : '';
+  }
+
   return (
     <AppContext.Provider value={globalState}>
       <div className={AppStyle['App']}>
@@ -46,7 +53,7 @@ function App() {
                     </div>
                   ) : (
                     <div>
-                      <a href='/#'>Sign Out</a>
+                      <button onClick={handleLogout}>Sign Out</button>
                     </div>
                   )
                 }
