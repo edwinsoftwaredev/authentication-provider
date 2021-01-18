@@ -32,7 +32,7 @@ selfservice:
     link:
       enabled: true
   # should return here to be able to validate the session and continue with hydra flow
-  default_browser_return_url: http://127.0.0.1:4455/auth/
+  default_browser_return_url: http://127.0.0.1:4455/auth
   whitelisted_return_urls:
     - http://127.0.0.1:4455/
 
