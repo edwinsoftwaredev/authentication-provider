@@ -57,6 +57,14 @@ const Login: React.FC = () => {
 
   return (
     <div className={style['login-component']}>
+      <div className={style['header']}>
+        <div className={style['title']}>
+          Authentication Provider
+        </div>
+        <div className={style['sub-title']}>
+          Sign In
+        </div>
+      </div>
       <form 
         className={style['login-form']} 
         action={action}

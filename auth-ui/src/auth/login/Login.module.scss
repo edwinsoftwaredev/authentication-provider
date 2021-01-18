@@ -2,6 +2,20 @@
   padding: 10px;
   width: 22%;
   
+  .header {
+    color: darkslategray;
+    
+    .title {
+      font-size: 2.5em;
+      font-weight: 600;
+    }
+
+    .sub-title {
+      font-size: 2em;
+      font-weight: 500;
+    }
+  }
+
   .login-form {
     width: 100%;
 
