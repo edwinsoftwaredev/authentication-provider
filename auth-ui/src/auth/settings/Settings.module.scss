@@ -1,0 +1,40 @@
+.settings-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3em;
+
+    .form-container {
+        border: 1px solid slategray;
+        padding: 5em 10em;
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        @media only screen and (max-width: 768px) {
+            padding: 5em;
+            width: 80%;
+        }
+
+        form {
+            width: 80%;
+
+            @media only screen and (max-width: 768px) {
+                width: 100%;
+            }
+
+            .form-buttons {
+                margin-top: 4em;
+            }
+        }
+
+        .title {
+            font-size: 3em;
+            color: darkslategray;
+            font-weight: 600;
+        }
+    }
+}
