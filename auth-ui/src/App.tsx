@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import AppStyle from './App.module.scss';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
