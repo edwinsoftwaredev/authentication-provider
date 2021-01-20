@@ -1,0 +1,36 @@
+.app-bar-component {
+    display: none;
+    background-color: slategray;
+    height: 5em;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin-bottom: 1.5em;
+
+    @media screen and (max-width: 768px) {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        z-index: 1;
+    }
+
+    &.menu-open {
+        @media screen and (max-width: 768px) {
+            z-index: 0;
+        }
+    }
+
+    &.menu-closed {
+        @media screen and (max-width: 768px) {
+            z-index: 1;
+        }
+    }
+
+    .btn-icon {
+        padding: 0.5px;
+        font-size: 2.5em;
+        color: white;
+        margin-left: 0.8em;
+    }
+}
