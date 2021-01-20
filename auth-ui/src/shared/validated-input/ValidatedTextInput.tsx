@@ -41,7 +41,7 @@ const ValidatedTextInput: React.FC<IValidatedTextInput> = (props: any) => {
         className={ValidatedTextInputStyle['message-bar']}>
         <div className={ValidatedTextInputStyle['message']}>
           <div>
-            {props.others.fieldname + ' ' + (message)}
+            {props.others.fieldname + (message ? ': ' : ' ') + (message)}
           </div>
         </div>
       </div>
