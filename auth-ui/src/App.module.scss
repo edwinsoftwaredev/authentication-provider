@@ -8,16 +8,20 @@
   max-height: 100vh;
   overflow: hidden;
 
-  .menu {
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
+
+  /*.menu {
     flex-grow: 1;
     min-width: 20%;
-    background-color: lightslategray;
 
-    @media only screen and (max-width: 1300px) {
-      min-width: auto;
+    @media only screen and (max-width: 768px) {
       flex-grow: 0;
+      position: absolute;
+      height: 100vh;
     }
-  }
+  }*/
 
   .app-container {
     flex-grow: 4;
@@ -39,7 +43,7 @@
       .auth-buttons {
         display: flex;
         flex-direction: column;
-        width: 25%;
+        width: 15em;
         * {
           margin-top: 0.8em;
         }

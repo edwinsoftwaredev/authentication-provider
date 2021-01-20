@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import AppStyle from './App.module.scss';
-import {BrowserRouter as Router, Route, Switch, useLocation} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
 import useWhoAmI, { WhoAmIStatus } from './shared/hooks/useWhoAmI';
 import AppContext from './shared/context/app-context';
 import Menu from './shared/menu/Menu';
 import Button from './shared/button/button';
+import AppBar from './shared/app-bar/AppBar';
 
 const initialState = {
   isUserActive: WhoAmIStatus.NotFetched,
+  isDrawerOpen: false,
+  toggleDrawer: () => {}
 };
 
 function App() {
   const [globalState, setGlobalState] = useState(initialState);
   const whoAmI = useWhoAmI();
+
+  const toogleDrawer = () => {
+    setGlobalState(state => ({...state, isDrawerOpen: !state.isDrawerOpen}));
+  }
+
+  useEffect(() => {
+    setGlobalState(state => ({...state, toggleDrawer: toogleDrawer}));
+  }, [])
 
   useEffect(() => {
     setGlobalState(state => ({...state, isUserActive: whoAmI}));
@@ -33,15 +44,14 @@ function App() {
     <AppContext.Provider value={globalState}>
       <div className={AppStyle['App']}>
         <Router>
+          <AppBar />
           {
             window.location.pathname !== '/auth/login' && 
             window.location.pathname !== '/auth/registration' &&
             window.location.pathname !== '/auth/verify' &&
             window.location.pathname !== '/auth/consent' &&
-            globalState.isUserActive === WhoAmIStatus.Active ? (
-              <div className={AppStyle['menu']}>
-                <Menu />
-              </div>
+            globalState.isUserActive === WhoAmIStatus.Active || true ? (
+              <Menu />
             ) : null
           }
           <div className={AppStyle['app-container']}>
