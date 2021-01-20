@@ -1,31 +1,29 @@
 .settings-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 3em;
+    margin: auto; /*auth component is a flex*/
+    width: 45%;
 
+    @media only screen and (max-width: 768px) {
+        width: 95%;
+    }
+
+    .header {
+        font-size: 4em;
+        font-weight: 600;
+        color: darkslategray;
+        text-align: left;
+        margin: 0.5em 0;
+    }
+    
     .form-container {
         border: 1px solid slategray;
-        padding: 5em 10em;
-        width: 30%;
+        padding: 5em 6em;
         display: flex;
         flex-direction: column;
         align-items: center;
-
-        @media only screen and (max-width: 768px) {
-            padding: 5em;
-            width: 80%;
-        }
+        margin: 1em auto;
 
         form {
-            width: 80%;
-
-            @media only screen and (max-width: 768px) {
-                width: 100%;
-            }
-
+            width: 100%;
             .form-buttons {
                 margin-top: 4em;
             }

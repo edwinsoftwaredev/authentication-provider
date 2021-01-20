@@ -12,7 +12,8 @@ const getFieldMessage =
     name: string,
     setState: React.Dispatch<React.SetStateAction<T | string>>
   ) => {
-    const value = fields.find(field => field.name === name)?.messages?.join(' ');
+    const value =
+      fields.find(field => field.name === name)?.messages?.map(value => value.text).join(' ');
     setState(value ?? '');
 };
 
@@ -37,6 +38,12 @@ const Settings: React.FC = () => {
   const [profileEmailMsg, setProfileEmailMsg] = useState<string>('');
   const [profileAction, setProfileAction] = useState<string>('');
   const [profileMsg, setProfileMsg] = useState<string>('');
+
+  const [passwordCsrf, setPasswordCsrf] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [passwordMsg, setPasswordMsg] = useState<string>('');
+  const [passwordAction, setPasswordAction] = useState<string>('');
+  const [passwordMsgs, setPasswordMsgs] = useState<string>('');
 
   const location = useLocation();
 
@@ -80,11 +87,23 @@ const Settings: React.FC = () => {
       getFieldValue<string>(fields, 'traits.email', setProfileEmail);
       getFieldMessage<string>(fields, 'traits.email', setProfileEmailMsg);
 
+      const passwordFields = settingsFlow.methods.password.config.fields;
+      const passwordAction = settingsFlow.methods.password.config.action;
+      setPasswordAction(passwordAction ?? '');
+
+      const passwordMsgs = settingsFlow.methods.password.config.messages?.join(' ');
+      setPasswordMsgs(passwordMsgs ?? '');
+
+      getFieldValue<string>(passwordFields, 'csrf_token', setPasswordCsrf);
+
+      getFieldValue<string>(passwordFields, 'password', setPassword);
+      getFieldMessage<string>(passwordFields, 'password', setPasswordMsg);
     }
   }, [settingsFlow]);
 
   return (
     <div className={style['settings-container']}>
+      <div className={style['header']}>Accont Settings</div>
       <div className={style['form-container']}>
         <div className={style['title']}>Profile</div>
         <form
@@ -139,8 +158,38 @@ const Settings: React.FC = () => {
             />
           </div>
         </form>
-        <form>
-          
+      </div>
+      <div className={style['form-container']}>
+        <div className={style['title']}>Password</div>
+        <form
+          action={passwordAction}
+          method='POST'
+          encType="application/x-www-urlencoded"
+        >
+          <input
+            type='hidden'
+            value={passwordCsrf} 
+            name='csrf_token'
+            required
+          />
+          <ValidatedTextInput
+            name='password'
+            initialState={(setInitialState) => {
+              setInitialState(passwordMsg, !passwordMsg, password)
+            }}
+            value={val => null}
+            others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
+          />
+          {
+            passwordMsgs ? <AlertMessage message={passwordMsgs} type={'error'}/> : null
+          }
+          <div className={style['form-buttons']}>
+            <Button
+              classType='contained'
+              type='submit'
+              text='Save' 
+            />
+          </div>
         </form>
       </div>
     </div>
