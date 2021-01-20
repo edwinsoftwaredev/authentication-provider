@@ -3,24 +3,27 @@
 .App {
   text-align: center;
   background-color: $background-color;
+  display: flex;
+  flex-direction: row;
+  max-height: 100vh;
+  overflow: hidden;
+
+  .menu {
+    flex-grow: 1;
+    min-width: 20%;
+    background-color: lightslategray;
+
+    @media only screen and (max-width: 1300px) {
+      min-width: auto;
+      flex-grow: 0;
+    }
+  }
 
   .app-container {
-    display: flex;
-    flex-direction: row;
-
-    .menu {
-      flex-grow: 1;
-      min-width: 20%;
-      background-color: lightslategray;
-
-      @media only screen and (max-width: 1300px) {
-        min-width: auto;
-        flex-grow: 0;
-      }
-    }
+    flex-grow: 4;
+    overflow: auto;
 
     .app-content {
-      flex-grow: 4;
       height: 100vh;
       font-size: 1.3em;
       display: flex;
