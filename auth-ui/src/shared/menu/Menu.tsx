@@ -1,8 +1,7 @@
-import React, { Fragment, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import App from '../../App';
 import AppContext from '../context/app-context';
-import useWhoAmI, { WhoAmIStatus } from '../hooks/useWhoAmI';
+import { WhoAmIStatus } from '../hooks/useWhoAmI';
 import style from './Menu.module.scss';
 
 const Menu: React.FC = () => {
@@ -26,20 +25,53 @@ const Menu: React.FC = () => {
     history.push('/');
   };
 
+  const handleOverlayClick = () => {
+    if (appContext.isDrawerOpen) {
+      appContext.toggleDrawer();
+    }
+  };
+
   return (
-    <Fragment>
-      <ul className={style['list']}>
+    <div className=
+      {
+        style['menu-component'] + ' ' + 
+        (appContext.isDrawerOpen ? style['open'] : style['closed'])
+      }
+      onClick={handleOverlayClick}
+    >
+      <ul className=
         {
-          appContext.isUserActive === WhoAmIStatus.Active ? (
+          style['list'] + ' ' +
+          (appContext.isDrawerOpen ? style['open'] : style['closed'])
+        }
+        onClick={e => e.stopPropagation()}
+      >
+        {
+          appContext.isUserActive === WhoAmIStatus.Active || true ? (
             <div>
-              <li className={style['item']} onClick={handleHomeClick}>Home</li>
-              <li className={style['item']} onClick={handleSettingsClick}>Account</li>
-              <li className={style['item']} onClick={handleLogoutClick}>Logout</li>
+              <li className={style['item']} onClick={handleHomeClick}>
+                <div className={style['item-icon']}>
+                  <i className='bx bx-home-alt'></i>
+                  Home
+                </div>
+              </li>
+              <li className={style['item']} onClick={handleSettingsClick}>
+                <div className={style['item-icon']}>
+                  <i className='bx bxs-user-account'></i>
+                  Account
+                </div>
+              </li>
+              <li className={style['item']} onClick={handleLogoutClick}>
+                <div className={style['item-icon']}>
+                  <i className='bx bx-log-out-circle' ></i>
+                  Sign Out
+                </div>
+              </li>
             </div>
           ) : null
         }
       </ul>
-    </Fragment>
+    </div>
   )
 }
 
