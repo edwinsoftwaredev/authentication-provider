@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AppStyle from './App.module.scss';
-import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Switch, useLocation} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
 import useWhoAmI, { WhoAmIStatus } from './shared/hooks/useWhoAmI';
 import AppContext from './shared/context/app-context';
@@ -33,16 +33,20 @@ function App() {
     <AppContext.Provider value={globalState}>
       <div className={AppStyle['App']}>
         <Router>
-          <Switch>
-            <Route exact path='/'>
-              <div className={AppStyle['app-container']}>
-                {
-                  whoAmI === WhoAmIStatus.Active ? (
-                    <div className={AppStyle['menu']}>
-                    <Menu />
-                  </div>
-                  ) : null
-                }
+          {
+            window.location.pathname !== '/auth/login' && 
+            window.location.pathname !== '/auth/registration' &&
+            window.location.pathname !== '/auth/verify' &&
+            window.location.pathname !== '/auth/consent' &&
+            globalState.isUserActive === WhoAmIStatus.Active ? (
+              <div className={AppStyle['menu']}>
+                <Menu />
+              </div>
+            ) : null
+          }
+          <div className={AppStyle['app-container']}>
+            <Switch>
+              <Route exact path='/'>
                 <div className={AppStyle['app-content']}>
                   <h1 className={AppStyle['app-title']}>
                     Authentication Provider
@@ -60,18 +64,18 @@ function App() {
                           type='button'
                           text='Sign Up'
                           classType='default'
-                          onClick={handleRegistration} 
+                          onClick={handleRegistration}
                         />
                       </div>
                     ) : null
                   }
                 </div>
-              </div>
-            </Route>
-            <Route path='/auth'>
-              <Auth />
-            </Route>
-          </Switch>
+              </Route>
+              <Route path='/auth'>
+                <Auth />
+              </Route>
+            </Switch>
+          </div>
         </Router>
       </div>
     </AppContext.Provider>
