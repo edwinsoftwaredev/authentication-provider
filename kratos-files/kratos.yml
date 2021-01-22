@@ -15,7 +15,10 @@ serve:
 
 identity:
   # schemas might determine the access type of a user
-  default_schema_url: file:///etc/config/kratos/movie-polls-user.schema.json
+  default_schema_url: file:///etc/config/kratos/user.schema.json
+  schemas:
+    - id: user
+      url: file:///etc/config/kratos/user.schema.json
 
 selfservice:
   flows:
@@ -26,6 +29,9 @@ selfservice:
       after:
         # overrides url.default_browser_return_url
         default_browser_return_url: http://127.0.0.1:4455
+    recovery:
+      enabled: true
+      ui_url: http://127.0.0.1:4455/auth/recovery
     verification:
       enabled: true
       ui_url: http://127.0.0.1:4455/auth/verify
