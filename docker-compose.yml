@@ -31,7 +31,7 @@ services:
     image: oryd/kratos:latest
     ports: 
       - "4433:4433" # public
-      - "4434:4434" # admin
+      - "4434:4434" # admin - should not be exposed, check docs
     restart: unless-stopped
     environment: 
       - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KratosDb?max_conns=20&max_idle_conns=4
@@ -62,8 +62,8 @@ services:
     image: oryd/hydra:latest
     ports:
       - "4444:4444" # Public port
-      - "4445:4445" # Admin port
-      - "5555:5555" # Port for hydra token user
+      - "4445:4445" # Admin port - should not be exposed, check docs
+      - "5555:5555" # Port for hydra token user - should not be exposed, check docs
     environment: 
       - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/HydraDb?max_conns=20&max_idle_conns=4
       - SECRETS_SYSTEM={HYDRA_SECRETS_SYSTEM}
@@ -71,4 +71,32 @@ services:
       - ./hydra-files:/etc/config/hydra
     command:
       serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http # allows insecure connections. see docs
+    restart: unless-stopped
+
+  ory-keto-migrate:
+    depends_on:
+      - mysql-instance
+      - ory-hydra-migrate
+    image: oryd/keto:latest
+    environment: 
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
+    volumes: 
+      - ./keto-files:$HOME
+    command:
+      migrate sql -e --config $HOME/.keto.yaml
+    restart: on-failure
+
+  ory-keto:
+    depends_on:
+      - mysql-instance
+      - ory-keto-migrate
+    image: oryd/keto:latest
+    environment:
+      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
+    ports:
+      - "4456:4456" # should not be exposed
+    volumes:
+      - ./keto-files:$HOME
+    command:
+      serve all --config $HOME/.keto.yaml
     restart: unless-stopped
