@@ -94,7 +94,7 @@ services:
     environment:
       - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
     ports:
-      - "4456:4456" # should not be exposed
+      - "4466:4466" # should not be exposed
     volumes:
       - ./keto-files:$HOME
     command:
