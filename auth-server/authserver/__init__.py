@@ -1,10 +1,15 @@
+from logging import Logger
 import os
+from ory_keto_client import configuration
+from ory_keto_client.exceptions import ApiException
 import requests
 from requests.exceptions import ConnectionError, Timeout
 
 from flask import Flask
 from flask_cors.extension import CORS
 from . import blueprints
+import ory_keto_client
+import ory_kratos_client
 
 def create_app(test_config=None):
     # create and configure the app
@@ -37,8 +42,103 @@ def create_app(test_config=None):
     blueprints.init_app(app)
     
     create_client()
+    create_admin_user()
     return app
 
+###########################################################################################
+def create_admin_user():
+    print('Creating Admin user')
+    configuration = ory_kratos_client.Configuration(
+        host=os.environ.get('KRATOS_ADMIN_URL')
+    )
+
+    with ory_kratos_client.ApiClient(configuration) as api_client:
+        api_instance=ory_kratos_client.AdminApi(api_client)
+        body=ory_kratos_client.CreateIdentity(
+            schema_id=os.environ.get('USER_KRATOS_SCHEMA'),
+            traits={
+                'username':os.environ.get('ADMIN_USER'),
+                'email':os.environ.get('ADMIN_EMAIL'),
+                'name':os.environ.get('ADMIN_NAME')
+            }
+        )
+
+        try:
+            api_response=api_instance.create_identity(body=body)
+            role = upsert_role([api_response.id], 'SystemAdministrators')
+            acp = upsert_oacp(
+                [role.id],
+                ['administration:system'],
+                'System Adminitration Policy',
+                'AdministrationSystem',
+                'allow'
+            )
+            create_recovery_link(api_response.id)
+
+        except ApiException as e:
+            print(f'Exception when calling AdminApi->create_identity: {e}')
+
+
+def create_recovery_link(user_id: str):
+    print('Creating recovery link.')
+    configuration = ory_kratos_client.Configuration(
+        host=os.environ.get('KRATOS_ADMIN_URL')
+    )
+    
+    with ory_kratos_client.ApiClient(configuration) as api_client:
+        api_instance=ory_kratos_client.AdminApi(api_client)
+        body=ory_kratos_client.CreateRecoveryLink(expires_in='1h', identity_id=user_id)
+        try:
+            api_response=api_instance.create_recovery_link(body=body)
+            print(api_response)
+        except ApiException as e:
+            print(f'Exception when calling AdminApi->create_recovery_link: {e.reason}')
+
+
+def upsert_oacp(role_ids: list[str], resources: list[str], desc: str, id: str, effect: str):
+    # id might be something like: AdministratorsSystem
+    print('Creating policy.')
+    configuration = ory_keto_client.Configuration(
+        host=os.environ.get('ORY_KETO_URL')
+    )
+
+    with ory_keto_client.ApiClient(configuration) as api_client:
+        api_instance=ory_keto_client.EnginesApi(api_client)
+        flavor='exact'
+        body=ory_keto_client.OryAccessControlPolicy(
+            subjects=role_ids,
+            resources=resources,
+            description=desc,
+            id=id,
+            effect=effect
+        )
+
+        try:
+            api_response=api_instance.upsert_ory_access_control_policy(flavor, body=body)
+            return api_response
+        except ApiException as e:
+            print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy: {e.reason}')
+
+
+def upsert_role(members: list[str], id: str):
+    # id might be something like: SystemAdministrators
+    print('Creating role.')
+    configuration=ory_keto_client.Configuration(
+        host=os.environ.get('ORY_KETO_URL')
+    )
+
+    with ory_keto_client.ApiClient(configuration) as api_client:
+        api_instance=ory_keto_client.EnginesApi(api_client)
+        flavor='exact'
+        body=ory_keto_client.OryAccessControlPolicyRole(id=id, members=members)
+
+        try:
+            api_response=api_instance.upsert_ory_access_control_policy_role(flavor, body=body)
+            return api_response
+        except ApiException as e:
+            print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy_role: {e.reason}')
+        
+###########################################################################################
 
 def create_client():
     try:
