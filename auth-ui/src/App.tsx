@@ -50,6 +50,7 @@ function App() {
             window.location.pathname !== '/auth/registration' &&
             window.location.pathname !== '/auth/verify' &&
             window.location.pathname !== '/auth/consent' &&
+            window.location.pathname !== '/auth/recovery' &&
             globalState.isUserActive === WhoAmIStatus.Active ? (
               <Menu />
             ) : null
