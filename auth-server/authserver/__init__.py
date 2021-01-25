@@ -1,7 +1,6 @@
-from logging import Logger
+import logging
 import os
-from ory_keto_client import configuration
-from ory_keto_client.exceptions import ApiException
+from ory_keto_client.exceptions import ApiException as KetoApiException
 import requests
 from requests.exceptions import ConnectionError, Timeout
 
@@ -10,10 +9,12 @@ from flask_cors.extension import CORS
 from . import blueprints
 import ory_keto_client
 import ory_kratos_client
+from ory_kratos_client.exceptions import ApiException as KratosApiException
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    logging.basicConfig(level=logging.INFO)
     # to generate truly random secrets use
     # import secrets
     # print(secrets.token_urlsafe(32))
@@ -75,8 +76,11 @@ def create_admin_user():
             )
             create_recovery_link(api_response.id)
 
-        except ApiException as e:
-            print(f'Exception when calling AdminApi->create_identity: {e}')
+        except KratosApiException as e:
+            if e.status == 409:
+                logging.info('Admin user was not created because it already exists.')
+            else:
+                print(f'Exception when calling AdminApi->create_identity: {e}')
 
 
 def create_recovery_link(user_id: str):
@@ -91,7 +95,7 @@ def create_recovery_link(user_id: str):
         try:
             api_response=api_instance.create_recovery_link(body=body)
             print(api_response)
-        except ApiException as e:
+        except KratosApiException as e:
             print(f'Exception when calling AdminApi->create_recovery_link: {e.reason}')
 
 
@@ -116,7 +120,7 @@ def upsert_oacp(role_ids: list[str], resources: list[str], desc: str, id: str, e
         try:
             api_response=api_instance.upsert_ory_access_control_policy(flavor, body=body)
             return api_response
-        except ApiException as e:
+        except KetoApiException as e:
             print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy: {e.reason}')
 
 
@@ -135,7 +139,7 @@ def upsert_role(members: list[str], id: str):
         try:
             api_response=api_instance.upsert_ory_access_control_policy_role(flavor, body=body)
             return api_response
-        except ApiException as e:
+        except KetoApiException as e:
             print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy_role: {e.reason}')
         
 ###########################################################################################
