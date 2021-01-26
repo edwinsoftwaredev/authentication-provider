@@ -178,7 +178,7 @@ def consent_challenge():
     except ApiException as api_exception:
         logging.error(f'An ApiException occured: {api_exception.reason}')
 
-@bp.route('reject-consent-challenge', methods=['POST'])
+@bp.route('/reject-consent-challenge', methods=['POST'])
 def rjct_consent_challenge(): 
     def reject_consent_challenge(api_instance: AdminApi, consent_challenge: str):
         body=ory_hydra_client.RejectRequest()
@@ -235,7 +235,6 @@ def whoami():
         kratos_url = os.environ.get('KRATOS_SERVER')
         # cookies are forwarded
         res = requests.get(f'{kratos_url}/sessions/whoami', cookies=request.cookies)
-        
         if res.status_code == 401:
             abort(401)
 
