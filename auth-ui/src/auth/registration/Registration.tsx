@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import style from './Registration.module.scss';
-import {Configuration, PublicApi, RegistrationFlow} from '@oryd/kratos-client';
+import {Configuration, FormField, PublicApi} from '@oryd/kratos-client';
 import { useLocation } from 'react-router-dom';
 import ValidatedTextInput from '../../shared/validated-input/ValidatedTextInput';
 import Button from '../../shared/button/button';
@@ -8,13 +8,12 @@ import AlertMessage from '../../shared/alert-message/AlertMessage';
 
 const Registration: React.FC = () => {
   const [flowId, setFlowId] = useState<string>('');
-  const [registrationFlow, setRegistrationFlow] = useState<RegistrationFlow>();
   const [csrfToken, setCsrfToken] = useState<string>('');
-  const [usernameMessages, setUsernameMessages] =  useState<(string | undefined)[] | undefined>();
-  const [emailMessages, setEmailMessages] =  useState<(string | undefined)[] | undefined>();
-  const [passwordMessages, setPasswordMessages] =  useState<(string | undefined)[] | undefined>();
-  const [nameMessages, setNameMessages] =  useState<(string | undefined)[] | undefined>();
-  const [flowMessages, setFlowMessages] = useState<(string | undefined)[] | undefined>();
+  const [usernameMessages, setUsernameMessages] =  useState<string>('');
+  const [emailMessages, setEmailMessages] =  useState<string>('');
+  const [passwordMessages, setPasswordMessages] =  useState<string>('');
+  const [nameMessages, setNameMessages] =  useState<string>('');
+  const [flowMessages, setFlowMessages] = useState<string>('');
   const [action, setAction] = useState<string>('');
 
   const [username, setUsername] = useState<string>('');
@@ -39,7 +38,37 @@ const Registration: React.FC = () => {
 
     const getRegistrationFlow = async (flowId: string) => {
       const registrationFlow = (await kratos.getSelfServiceRegistrationFlow(flowId)).data;
-      setRegistrationFlow(registrationFlow); 
+      const fields = registrationFlow.methods.password.config.fields;
+
+      const getFieldValue = (name: string, fields: FormField[]): string => {
+        return fields.find(field => field.name === name)?.value as string | undefined ?? '';
+      };
+      
+      const getFieldMessages = (name: string, fields: FormField[]): string => {
+        return fields.find(field => field.name === name)?.messages?.map(msg => msg.text).join(' ') as string | undefined ?? '';
+      };
+
+      setCsrfToken(getFieldValue('csrf_token', fields));
+      setUsername(getFieldValue('traits.username', fields));
+      setEmail(getFieldValue('traits.email', fields));
+      setName(getFieldValue('traits.name', fields));
+
+      setPasswordMessages(getFieldMessages('password', fields));
+      setUsernameMessages(getFieldMessages('traits.username', fields));
+      setEmailMessages(getFieldMessages('traits.email', fields));
+      setNameMessages(getFieldMessages('traits.name', fields));
+
+      setFlowMessages(
+        registrationFlow
+          .methods
+          .password
+          .config
+          .messages
+          ?.map(message => message.text).join(' ') ?? ''
+      );
+
+      setAction(registrationFlow.methods.password.config.action);
+
     }
 
     if (flowId) {
@@ -47,86 +76,6 @@ const Registration: React.FC = () => {
     }
 
   }, [flowId]);
-
-  useEffect(() => {
-    if (registrationFlow) {
-      setCsrfToken((registrationFlow.methods.password.config.fields[0].value ?? '') as string);
-      setAction(registrationFlow.methods.password.config.action);
-      const usernameTemp = registrationFlow
-        .methods
-        .password
-        .config
-        .fields
-        .find(field => field.name === 'traits.username')
-        ?.value;
-      
-      setUsername(usernameTemp ? usernameTemp.toString() : '');
-      const emailTemp = registrationFlow
-        .methods
-        .password
-        .config
-        .fields
-        .find(field => field.name === 'traits.email')
-        ?.value;
-      setEmail(emailTemp ? emailTemp.toString() : '');
-      const nameTemp = registrationFlow
-        .methods
-        .password
-        .config
-        .fields
-        .find(field => field.name === 'traits.name')
-        ?.value;
-      setName(nameTemp ? nameTemp.toString() : '');
-      setPasswordMessages(
-        registrationFlow
-          .methods
-          .password
-          .config
-          .fields
-          .find(field => field.name === 'password')
-          ?.messages
-          ?.map(value => value.text)
-      );
-      setUsernameMessages(
-        registrationFlow
-          .methods
-          .password
-          .config
-          .fields
-          .find(field => field.name === 'traits.username')
-          ?.messages
-          ?.map(value => value.text)
-      );
-      setEmailMessages(
-        registrationFlow
-          .methods
-          .password
-          .config
-          .fields
-          .find(field => field.name === 'traits.email')
-          ?.messages
-          ?.map(value => value.text)
-      );
-      setNameMessages(
-        registrationFlow
-          .methods
-          .password
-          .config
-          .fields
-          .find(field => field.name === 'traits.name')
-          ?.messages
-          ?.map(value => value.text)
-      );
-      setFlowMessages(
-        registrationFlow
-          .methods
-          .password
-          .config
-          .messages
-          ?.map(message => message.text)
-      )
-    }
-  }, [registrationFlow])
 
   return (
     <div className={style['registration-component']}>
@@ -155,8 +104,7 @@ const Registration: React.FC = () => {
           <ValidatedTextInput 
             value={value => null}
             initialState={(setInputMessage) => {
-              const messages = emailMessages ?? [''];
-              setInputMessage(messages.join(', '), !messages, email);
+              setInputMessage(emailMessages, !emailMessages, email);
             }}
             name='traits.email'
             others={{fieldname: 'E-Mail', autoComplete: 'off'}}
@@ -164,8 +112,7 @@ const Registration: React.FC = () => {
           <ValidatedTextInput 
             value={value => null}
             initialState={(setInputMessage) => {
-              const messages = usernameMessages ?? [''];
-              setInputMessage(messages.join(', '), !messages, username);
+              setInputMessage(usernameMessages, !usernameMessages, username);
             }}
             name='traits.username'
             others={{fieldname: 'Username', autoComplete: 'off'}}
@@ -173,8 +120,7 @@ const Registration: React.FC = () => {
           <ValidatedTextInput 
             value={value => null}
             initialState={(setInputMessage) => {
-              const messages = nameMessages ?? [''];
-              setInputMessage(messages.join(', '), !messages, name);
+              setInputMessage(nameMessages, !nameMessages, name);
             }}
             name='traits.name'
             others={{fieldname: 'Name', autoComplete: 'off'}}
@@ -182,14 +128,13 @@ const Registration: React.FC = () => {
           <ValidatedTextInput 
             value={value => null}
             initialState={(setInputMessage) => {
-              const messages = passwordMessages ?? [''];
-              setInputMessage(messages.join('') ? ': ' + messages.join(', ') : '', !messages, '');
+              setInputMessage(passwordMessages, !passwordMessages, '');
             }}
             name='password'
             others={{fieldname: 'Password', autoComplete: 'off', type: 'password'}}
           />
           {
-            flowMessages ? <AlertMessage message={flowMessages.join(', ')} type={'error'}/> : null
+            flowMessages ? <AlertMessage message={flowMessages} type={'error'}/> : null
           }
           <div className={style['auth-buttons']}>
             <Button
