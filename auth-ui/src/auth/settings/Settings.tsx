@@ -45,6 +45,8 @@ const Settings: React.FC = () => {
   const [passwordAction, setPasswordAction] = useState<string>('');
   const [passwordMsgs, setPasswordMsgs] = useState<string>('');
 
+  const [flowMessages, setFlowMessages] = useState<string>('');
+
   const location = useLocation();
 
   useEffect(() => {
@@ -98,12 +100,17 @@ const Settings: React.FC = () => {
 
       getFieldValue<string>(passwordFields, 'password', setPassword);
       getFieldMessage<string>(passwordFields, 'password', setPasswordMsg);
+
+      setFlowMessages(settingsFlow.messages?.map(msg => msg.text).join(' ') ?? '');
     }
   }, [settingsFlow]);
 
   return (
     <div className={style['settings-container']}>
       <div className={style['header']}>Accont Settings</div>
+      {
+        flowMessages ? <AlertMessage message={flowMessages} type={'error'}/> : null
+      }
       <div className={style['form-container']}>
         <div className={style['title']}>Profile</div>
         <form
