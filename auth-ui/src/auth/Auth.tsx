@@ -10,6 +10,7 @@ import Consent from './consent/Consent';
 import AppContext from '../shared/context/app-context';
 import { WhoAmIStatus } from '../shared/hooks/useWhoAmI';
 import Settings from './settings/Settings';
+import Recovery from './recovery/Recovery';
 
 const redirectToLogin = () => {
   window.location.href = `${process.env.REACT_APP_KRATOS_SELF_SERVICE_LOGIN}` +
@@ -149,6 +150,9 @@ const Auth: React.FC = () => {
         </Route>
         <Route exact path='/auth/settings'>
           <Settings />
+        </Route>
+        <Route exact path='/auth/recovery'>
+          <Recovery />
         </Route>
       </Switch>
     </div>
