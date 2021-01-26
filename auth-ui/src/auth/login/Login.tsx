@@ -20,7 +20,7 @@ const Login: React.FC = () => {
   const handleSignUpClick = (e: any) => {
     /**
      * Here the actual window.location.href is used by ory kratos after
-     * the registration flow is completed, to redirect the browser to the location.
+     * the registration flow is completed to redirect the browser to the location.
      * This location has the login_flow which at the same time has the login_challenge
      * required to authenticate the oauth2 client.
      */
@@ -112,6 +112,10 @@ const Login: React.FC = () => {
               text={'Sign In'}
               type='submit'
             />
+            <div className={style['links']}>
+              <a href={process.env.REACT_APP_KRATOS_RECOVERY}>Forgot Password?</a>
+            </div>
+            <hr className={style['brk-line']} />
             <Button 
               classType={'default'}
               text={'Create New Account'}

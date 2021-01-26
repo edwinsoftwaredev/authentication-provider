@@ -24,9 +24,24 @@
       flex-direction: column;
 
       .auth-buttons {
-        * {
+        *:nth-child(1) {
+          margin-top: 10px;
+        }
+        
+        .brk-line {
+          margin: 25px 0;
+          border-color: whitesmoke;
+        }
+
+        .links {
           margin: 10px 0 0 0;
-        } 
+          a {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: cornflowerblue;
+            text-decoration: none;
+          }
+        }
       }
     }
   }
