@@ -8,8 +8,6 @@ serve:
   public:
     cors:
       enabled: true
-      allowed_origins:
-        - http://127.0.0.1:3000
 
 # webfinger:
 #  oidc_discovery:
