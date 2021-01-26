@@ -18,7 +18,8 @@ const Menu: React.FC = () => {
   // https://www.ory.sh/kratos/docs/self-service/flows/user-logout#self-service-user-logout-for-browser-applications
   const handleLogoutClick = () => {
     const redir = process.env.REACT_APP_KRATOS_LOGOUT;
-    window.location.href =  redir ? redir + `?return_to=${window.location.href}` : '';
+    // window.location.href =  redir ? redir + `?return_to=${window.location.href}` : '';
+    window.location.href =  redir ? redir : '';
   };
 
   const handleHomeClick = () => {

@@ -37,6 +37,9 @@ selfservice:
       ui_url: http://127.0.0.1:4455/auth/verify
     settings:
       ui_url: http://127.0.0.1:4455/auth/settings
+    logout:
+      after:
+        default_browser_return_url: http://127.0.0.1:4455
     #  privileged_session_max_age: 1m
   methods:
     password: # form of authentication
