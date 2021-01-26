@@ -1,3 +1,10 @@
+## deployment instructions:
+## all migrations are executed first
+## then remove or comment the migrations
+## and add or uncomment the other instances that 
+## depend of the migratios.
+## For each ory instance use a specific version instead of "latest"
+
 version: "3.9"
 services:
   mysql-instance:
@@ -13,21 +20,21 @@ services:
     ports:
       - 3306:3306
   
-  ory-kratos-migrate: # Instance to control migrations
-    depends_on: 
-      - mysql-instance
-    image: oryd/kratos:latest
-    environment: 
-      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KratosDb?max_conns=20&max_idle_conns=4
-    volumes: 
-      - ./kratos-files:/etc/config/kratos
-    command: 
-      -c /etc/config/kratos/kratos.yml migrate sql -e --yes
-    restart: on-failure
+  #ory-kratos-migrate: # Instance to control migrations
+  #  depends_on: 
+  #    - mysql-instance
+  #  image: oryd/kratos:latest
+  #  environment: 
+  #    - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KratosDb?max_conns=20&max_idle_conns=4
+  #  volumes: 
+  #    - ./kratos-files:/etc/config/kratos
+  #  command: 
+  #    -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+  #  restart: on-failure
   
   ory-kratos:
     depends_on: 
-      - ory-kratos-migrate
+      - mysql-instance
     image: oryd/kratos:latest
     ports: 
       - "4433:4433" # public
@@ -42,23 +49,22 @@ services:
     command:
       serve -c /etc/config/kratos/kratos.yml --dev
 
-  ory-hydra-migrate:
-    depends_on: 
-      - mysql-instance
-      - ory-kratos-migrate
-    image: oryd/hydra:latest
-    environment: 
-      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/HydraDb?max_conns=20&max_idle_conns=4
-    volumes: 
-      - ./hydra-files:/etc/config/hydra
-    command:
-      migrate -c /etc/config/hydra/hydra.yml sql -e --yes
-    restart: on-failure
+  #ory-hydra-migrate:
+  #  depends_on: 
+  #    - mysql-instance
+  #    - ory-kratos-migrate
+  #  image: oryd/hydra:latest
+  #  environment: 
+  #    - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/HydraDb?max_conns=20&max_idle_conns=4
+  #  volumes: 
+  #    - ./hydra-files:/etc/config/hydra
+  #  command:
+  #    migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+  #  restart: on-failure
 
   ory-hydra:
     depends_on:
       - mysql-instance
-      - ory-hydra-migrate
     image: oryd/hydra:latest
     ports:
       - "4444:4444" # Public port
@@ -73,23 +79,22 @@ services:
       serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http # allows insecure connections. see docs
     restart: unless-stopped
 
-  ory-keto-migrate:
-    depends_on:
-      - mysql-instance
-      - ory-hydra-migrate
-    image: oryd/keto:latest
-    environment: 
-      - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
-    volumes: 
-      - ./keto-files:$HOME
-    command:
-      migrate sql -e --config $HOME/.keto.yaml
-    restart: on-failure
+  #ory-keto-migrate:
+  #  depends_on:
+  #    - mysql-instance
+  #    - ory-hydra-migrate
+  #  image: oryd/keto:latest
+  #  environment: 
+  #    - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
+  #  volumes: 
+  #    - ./keto-files:$HOME
+  #  command:
+  #    migrate sql -e --config $HOME/.keto.yaml
+  #  restart: on-failure
 
   ory-keto:
     depends_on:
       - mysql-instance
-      - ory-keto-migrate
     image: oryd/keto:latest
     environment:
       - DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql-instance)/KetoDb?max_conns=20&max_idle_conns=4
