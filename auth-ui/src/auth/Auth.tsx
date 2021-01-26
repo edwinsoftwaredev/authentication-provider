@@ -90,8 +90,10 @@ const Auth: React.FC = () => {
           }
         ).then(res => {
           if (res.data.redirectUrl) {
+            // this happens when consent is skipped
             window.location.href = res.data.redirectUrl;  
           } else {
+            // this happens when consent is not skipped
             history.push('/auth/consent', res.data);
           }
         });
