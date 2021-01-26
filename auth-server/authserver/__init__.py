@@ -1,5 +1,6 @@
 import logging
 import os
+from flask_wtf.csrf import CSRFError
 from ory_keto_client.exceptions import ApiException as KetoApiException
 import requests
 from requests.exceptions import ConnectionError, Timeout
@@ -14,7 +15,6 @@ from ory_kratos_client.exceptions import ApiException as KratosApiException
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    logging.basicConfig(level=logging.INFO)
     # to generate truly random secrets use
     # import secrets
     # print(secrets.token_urlsafe(32))
@@ -42,13 +42,13 @@ def create_app(test_config=None):
     CORS(app, origins=[os.environ.get('ALLOWED_ORIGIN')], supports_credentials=True)
     blueprints.init_app(app)
     
-    create_client()
-    create_admin_user()
+    create_client(app.logger)
+    create_admin_user(app.logger)
     return app
 
 ###########################################################################################
-def create_admin_user():
-    print('Creating Admin user')
+def create_admin_user(logger):
+    logger.info('Creating admin user')
     configuration = ory_kratos_client.Configuration(
         host=os.environ.get('KRATOS_ADMIN_URL')
     )
@@ -66,7 +66,7 @@ def create_admin_user():
 
         try:
             api_response=api_instance.create_identity(body=body)
-            role = upsert_role([api_response.id], 'SystemAdministrators')
+            role = upsert_role(logger ,[api_response.id], 'SystemAdministrators')
             acp = upsert_oacp(
                 [role.id],
                 ['administration:system'],
@@ -74,34 +74,23 @@ def create_admin_user():
                 'AdministrationSystem',
                 'allow'
             )
-            create_recovery_link(api_response.id)
 
         except KratosApiException as e:
             if e.status == 409:
-                logging.info('Admin user was not created because it already exists.')
+                logger.info('Admin user was not created because it already exists.')
             else:
-                print(f'Exception when calling AdminApi->create_identity: {e}')
+                logger.error(f'Exception when calling AdminApi->create_identity: {e}')
 
 
-def create_recovery_link(user_id: str):
-    print('Creating recovery link.')
-    configuration = ory_kratos_client.Configuration(
-        host=os.environ.get('KRATOS_ADMIN_URL')
-    )
-    
-    with ory_kratos_client.ApiClient(configuration) as api_client:
-        api_instance=ory_kratos_client.AdminApi(api_client)
-        body=ory_kratos_client.CreateRecoveryLink(expires_in='1h', identity_id=user_id)
-        try:
-            api_response=api_instance.create_recovery_link(body=body)
-            print(api_response)
-        except KratosApiException as e:
-            print(f'Exception when calling AdminApi->create_recovery_link: {e.reason}')
-
-
-def upsert_oacp(role_ids: list[str], resources: list[str], desc: str, id: str, effect: str):
+def upsert_oacp(
+    logger,
+    role_ids: list[str], 
+    resources: list[str], 
+    desc: str, 
+    id: str, 
+    effect: str):
     # id might be something like: AdministratorsSystem
-    print('Creating policy.')
+    logger.info('Creating admin user policy.')
     configuration = ory_keto_client.Configuration(
         host=os.environ.get('ORY_KETO_URL')
     )
@@ -121,12 +110,12 @@ def upsert_oacp(role_ids: list[str], resources: list[str], desc: str, id: str, e
             api_response=api_instance.upsert_ory_access_control_policy(flavor, body=body)
             return api_response
         except KetoApiException as e:
-            print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy: {e.reason}')
+            logger.error(f'Exception when calling EnginesApi->upsert_ory_access_control_policy: {e.reason}')
 
 
-def upsert_role(members: list[str], id: str):
+def upsert_role(logger, members: list[str], id: str):
     # id might be something like: SystemAdministrators
-    print('Creating role.')
+    logger.info('Creating admin user role.')
     configuration=ory_keto_client.Configuration(
         host=os.environ.get('ORY_KETO_URL')
     )
@@ -140,11 +129,12 @@ def upsert_role(members: list[str], id: str):
             api_response=api_instance.upsert_ory_access_control_policy_role(flavor, body=body)
             return api_response
         except KetoApiException as e:
-            print(f'Exception when calling EnginesApi->upsert_ory_access_control_policy_role: {e.reason}')
+            logger.error(f'Exception when calling EnginesApi->upsert_ory_access_control_policy_role: {e.reason}')
         
 ###########################################################################################
 
-def create_client():
+def create_client(logger):
+    logger.info('Creating client demo.')
     try:
         url = os.environ.get('HYDRA_ADMIN_SERVER')
         r = requests.get(f'{url}/health/alive', timeout=5)
@@ -152,7 +142,7 @@ def create_client():
             rg = requests.get(f'{url}/clients')
 
             if rg.json() and rg.json()[0]['client_id'] == 'ClientDemo':
-                print('Client Already Exists.')
+                logger.info('Client demo was not created because it already exists.')
                 return
 
             headers = {
@@ -173,7 +163,7 @@ def create_client():
                 # check docs https://www.ory.sh/hydra/docs/guides/oauth2-public-spa-mobile
                 'token_endpoint_auth_method': 'none', 
                 'response_types': ['code'],
-                'scope': 'openid clientdemo.demo',
+                'scope': 'openid profile',
                 'post_logout_redirect_uris': [post_logout_redirect_url],
                 'redirect_uris': [f'{auth_client}/auth/codes'],
                 'allowed_cors_origins': [os.environ.get('CLIENT_URL')]
@@ -186,10 +176,10 @@ def create_client():
             )
 
             if rp.status_code == 201:
-                print('Client Created.')
+                logger.info('Client created.')
         
     except ConnectionError:
-        print('Hydra server is unreachable.')
+        logger.error('Hydra server is unreachable.')
     except Timeout:
-        print('Hydra did not return a response.')
+        logger.error('Hydra did not return a response.')
 
