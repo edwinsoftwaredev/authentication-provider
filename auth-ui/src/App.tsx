@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import AppStyle from './App.module.scss';
-import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Switch, useLocation} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
 import useWhoAmI, { WhoAmIStatus } from './shared/hooks/useWhoAmI';
 import AppContext from './shared/context/app-context';
@@ -12,6 +12,27 @@ const initialState = {
   isUserActive: WhoAmIStatus.NotFetched,
   isDrawerOpen: false,
   toggleDrawer: () => {}
+};
+
+const ConditionalMenu: React.FC = () => {
+  const location = useLocation();
+  const appContext = useContext(AppContext);
+
+  return (
+    <Fragment>
+      {
+        location.pathname !== '/auth/login' && 
+        location.pathname !== '/auth/registration' &&
+        location.pathname !== '/auth/verify' &&
+        location.pathname !== '/auth/consent' &&
+        location.pathname !== '/auth/recovery' &&
+        location.pathname !== '/auth' &&
+        appContext.isUserActive === WhoAmIStatus.Active ? (
+          <Menu />
+        ) : null
+      } 
+    </Fragment> 
+  );
 };
 
 function App() {
@@ -45,16 +66,7 @@ function App() {
       <div className={AppStyle['App']}>
         <Router>
           <AppBar />
-          {
-            window.location.pathname !== '/auth/login' && 
-            window.location.pathname !== '/auth/registration' &&
-            window.location.pathname !== '/auth/verify' &&
-            window.location.pathname !== '/auth/consent' &&
-            window.location.pathname !== '/auth/recovery' &&
-            globalState.isUserActive === WhoAmIStatus.Active ? (
-              <Menu />
-            ) : null
-          }
+          <ConditionalMenu />
           <div className={AppStyle['app-container']}>
             <Switch>
               <Route exact path='/'>
