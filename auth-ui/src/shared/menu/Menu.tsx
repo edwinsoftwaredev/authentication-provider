@@ -3,6 +3,40 @@ import { useHistory } from 'react-router-dom';
 import AppContext from '../context/app-context';
 import { WhoAmIStatus } from '../hooks/useWhoAmI';
 import style from './Menu.module.scss';
+import default_user_pic from '../resources/default_profile_pic.jpg';
+
+const UserInfoMenu: React.FC = () => {
+  const appContext = useContext(AppContext);
+
+  return (
+    <div className={style['user-info-menu']}>
+      {
+        appContext.user.traits ? (
+          <div className={style['user-info-container']}>
+            <div className={style['user-info-picture']}>
+              {
+                appContext.user.traits.picture ? (
+                  <div style={{backgroundImage: 'url(' + appContext.user.traits.picture + ')'}}></div>
+                ) : (
+                  <div style={{backgroundImage: 'url(' + default_user_pic + ')'}} ></div>
+                )
+              }
+            </div>
+            <div className={style['user-info-name']}>
+              {appContext.user.traits.name}
+            </div>
+            <div className={style['user-info-username']}>
+              {appContext.user.traits.username}
+            </div>
+            <div className={style['user-info-email']}>
+              {appContext.user.traits.email}
+            </div>
+          </div>
+        ) : null
+      }
+    </div>
+  )
+};
 
 const Menu: React.FC = () => {
   
@@ -47,6 +81,7 @@ const Menu: React.FC = () => {
         }
         onClick={e => e.stopPropagation()}
       >
+        <UserInfoMenu />
         {
           appContext.user.active === WhoAmIStatus.Active ? (
             <div>
