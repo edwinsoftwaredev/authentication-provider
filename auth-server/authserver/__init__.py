@@ -68,6 +68,7 @@ def create_admin_user(logger):
             api_response=api_instance.create_identity(body=body)
             role = upsert_role(logger ,[api_response.id], 'SystemAdministrators')
             acp = upsert_oacp(
+                logger,
                 [role.id],
                 ['administration:system'],
                 'System Adminitration Policy',
