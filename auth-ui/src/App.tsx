@@ -2,14 +2,14 @@ import React, { Fragment, useContext, useEffect, useState } from 'react';
 import AppStyle from './App.module.scss';
 import {BrowserRouter as Router, Route, Switch, useLocation} from 'react-router-dom'
 import Auth from '../src/auth/Auth';
-import useWhoAmI, { WhoAmIStatus } from './shared/hooks/useWhoAmI';
+import useWhoAmI, { WhoAmIStatus, IUser } from './shared/hooks/useWhoAmI';
 import AppContext from './shared/context/app-context';
 import Menu from './shared/menu/Menu';
 import Button from './shared/button/button';
 import AppBar from './shared/app-bar/AppBar';
 
 const initialState = {
-  isUserActive: WhoAmIStatus.NotFetched,
+  user: {} as IUser,
   isDrawerOpen: false,
   toggleDrawer: () => {}
 };
@@ -27,7 +27,7 @@ const ConditionalMenu: React.FC = () => {
         location.pathname !== '/auth/consent' &&
         location.pathname !== '/auth/recovery' &&
         location.pathname !== '/auth' &&
-        appContext.isUserActive === WhoAmIStatus.Active ? (
+        appContext.user.active === WhoAmIStatus.Active ? (
           <Menu />
         ) : null
       } 
@@ -48,7 +48,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    setGlobalState(state => ({...state, isUserActive: whoAmI}));
+    setGlobalState(state => ({...state, user: whoAmI ?? {} as IUser}));
   }, [whoAmI]);
 
   const handleLogin = () => {
@@ -75,7 +75,7 @@ function App() {
                     Authentication Provider
                   </h1>
                   {
-                    whoAmI === WhoAmIStatus.NotAuthorized ? (
+                    whoAmI && whoAmI.active === WhoAmIStatus.NotAuthorized ? (
                       <div className={AppStyle['auth-buttons']}>
                         <Button 
                           type='button' 

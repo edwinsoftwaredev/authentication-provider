@@ -61,7 +61,7 @@ const Auth: React.FC = () => {
       location.pathname === '/auth' &&
       isCsrfToken &&
       !(loginChallenge || consentChallenge || logoutChallenge) &&
-      context.isUserActive === WhoAmIStatus.Active
+      context.user.active === WhoAmIStatus.Active
     ) {
       history.push('/');
     }
@@ -71,15 +71,15 @@ const Auth: React.FC = () => {
       isCsrfToken &&
       (loginChallenge || consentChallenge || logoutChallenge)
     ) {
-      if (loginChallenge && context.isUserActive === WhoAmIStatus.Active) {
+      if (loginChallenge && context.user.active === WhoAmIStatus.Active) {
         processLoginChallenge(loginChallenge);
       }
 
-      if (loginChallenge && context.isUserActive === WhoAmIStatus.NotAuthorized) {
+      if (loginChallenge && context.user.active === WhoAmIStatus.NotAuthorized) {
         redirectToLogin();
       }
 
-      if (consentChallenge && context.isUserActive === WhoAmIStatus.Active) {
+      if (consentChallenge && context.user.active === WhoAmIStatus.Active) {
         Axios.get(
           `${process.env.REACT_APP_AUTH_SERVER_CONSENT_CHALLENGE}`,
           {
@@ -130,7 +130,7 @@ const Auth: React.FC = () => {
               loginChallenge || 
               consentChallenge || 
               logoutChallenge || 
-              context.isUserActive === WhoAmIStatus.Active
+              context.user.active === WhoAmIStatus.Active
             ) ? (
               <div className={style['auth-message']}>
                 A challenge is required to continue. 

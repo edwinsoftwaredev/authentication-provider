@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 
 export enum WhoAmIStatus {
   NotFetched,
@@ -8,23 +8,32 @@ export enum WhoAmIStatus {
   NotAuthorized
 }
 
+export interface IUser {
+  active: WhoAmIStatus;
+  traits: {
+    email: string;
+    name: string;
+    username: string;
+  }
+}
+
 const useWhoAmI = () => {
-  const [isUserActive, setIsUserActive] = useState<WhoAmIStatus>(WhoAmIStatus.NotFetched);
+  const [user, setUser] = useState<IUser>();
 
   useEffect(() => {
     Axios.get(
       `${process.env.REACT_APP_AUTH_SERVER_WHOAMI}`,
       {withCredentials: true}
-    ).then(res => {
+    ).then((res: AxiosResponse<IUser>) => {
       if (res.data.active) {
-        setIsUserActive(WhoAmIStatus.Active);
+        setUser({...res.data, active: WhoAmIStatus.Active});
       } else {
-        setIsUserActive(WhoAmIStatus.NotActive);
+        setUser({...res.data, active: WhoAmIStatus.NotActive});
       }
-    }, reason => setIsUserActive(WhoAmIStatus.NotAuthorized));
+    }, reason => setUser({active: WhoAmIStatus.NotAuthorized} as IUser));
   }, []);
 
-  return isUserActive;
+  return user;
 }
 
 export default useWhoAmI;

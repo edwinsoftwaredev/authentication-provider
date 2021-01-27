@@ -48,7 +48,7 @@ const Menu: React.FC = () => {
         onClick={e => e.stopPropagation()}
       >
         {
-          appContext.isUserActive === WhoAmIStatus.Active ? (
+          appContext.user.active === WhoAmIStatus.Active ? (
             <div>
               <li className={style['item']} onClick={handleHomeClick}>
                 <div className={style['item-icon']}>

@@ -1,8 +1,8 @@
 import React from 'react';
-import { WhoAmIStatus } from '../hooks/useWhoAmI';
+import { WhoAmIStatus, IUser } from '../hooks/useWhoAmI';
 
 const appContextObject = {
-  isUserActive: WhoAmIStatus.NotFetched,
+  user: {} as IUser,
   isDrawerOpen: false,
   toggleDrawer: () => {}
 };

@@ -1,6 +1,4 @@
-import logging
 import os
-from flask_wtf.csrf import CSRFError
 from ory_keto_client.exceptions import ApiException as KetoApiException
 import requests
 from requests.exceptions import ConnectionError, Timeout
