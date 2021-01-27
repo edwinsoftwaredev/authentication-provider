@@ -14,6 +14,7 @@ export interface IUser {
     email: string;
     name: string;
     username: string;
+    picture: string;
   }
 }
 

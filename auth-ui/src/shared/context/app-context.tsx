@@ -1,5 +1,5 @@
 import React from 'react';
-import { WhoAmIStatus, IUser } from '../hooks/useWhoAmI';
+import { IUser } from '../hooks/useWhoAmI';
 
 const appContextObject = {
   user: {} as IUser,
