@@ -7,6 +7,7 @@ import AppContext from './shared/context/app-context';
 import Menu from './shared/menu/Menu';
 import Button from './shared/button/button';
 import AppBar from './shared/app-bar/AppBar';
+import Clients from './clients/Clients';
 
 const initialState = {
   user: {} as IUser,
@@ -96,6 +97,9 @@ function App() {
               </Route>
               <Route path='/auth'>
                 <Auth />
+              </Route>
+              <Route exact path='/clients'>
+                <Clients />
               </Route>
             </Switch>
           </div>
