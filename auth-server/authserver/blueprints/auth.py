@@ -243,8 +243,6 @@ def whoami():
             'action':action
         }
 
-        print(data)
-
         res=requests.post(
             f'{host}/engines/acp/ory/exact/allowed',
             json=data,
@@ -267,11 +265,10 @@ def whoami():
                 action='create'
             )
 
-            print(is_sysadmin)
-
             return {
                 'active': res.json()['active'],
-                'traits': res.json()['identity']['traits']
+                'traits': res.json()['identity']['traits'],
+                'isSysAdmin': is_sysadmin['allowed']
             }
         elif res.json() and 'active' not in res.json():
             abort(500)
