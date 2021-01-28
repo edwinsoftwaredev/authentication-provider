@@ -72,7 +72,8 @@ def create_admin_user(logger):
                 ['administration:system'],
                 'System Adminitration Policy',
                 'AdministrationSystem',
-                'allow'
+                'allow',
+                ['create','modify','delete','read']
             )
 
         except KratosApiException as e:
@@ -88,7 +89,8 @@ def upsert_oacp(
     resources: list[str], 
     desc: str, 
     id: str, 
-    effect: str):
+    effect: str,
+    actions: list[str]):
     # id might be something like: AdministratorsSystem
     logger.info('Creating admin user policy.')
     configuration = ory_keto_client.Configuration(
@@ -103,7 +105,8 @@ def upsert_oacp(
             resources=resources,
             description=desc,
             id=id,
-            effect=effect
+            effect=effect,
+            actions=actions
         )
 
         try:

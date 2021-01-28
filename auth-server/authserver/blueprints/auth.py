@@ -7,8 +7,6 @@ from ory_hydra_client.rest import ApiException
 import ory_hydra_client
 import requests
 from requests.exceptions import Timeout
-from werkzeug.utils import redirect
-
 
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -231,6 +229,30 @@ def logout_challenge():
 
 @bp.route('/whoami', methods=['GET'])
 def whoami():
+    def is_allowed(subject: str, resource: str, action: str): 
+        host=os.environ.get('ORY_KETO_URL')
+        
+        headers={
+            'content-type': 'application/json',
+            'accept': 'application/json'
+        }
+
+        data={
+            'subject':subject,
+            'resource':resource,
+            'action':action
+        }
+
+        print(data)
+
+        res=requests.post(
+            f'{host}/engines/acp/ory/exact/allowed',
+            json=data,
+            headers=headers
+        )
+
+        return res.json()
+
     try:
         kratos_url = os.environ.get('KRATOS_SERVER')
         # cookies are forwarded
@@ -239,7 +261,18 @@ def whoami():
             abort(401)
 
         if res.json() and 'active' in res.json():
-            return {'active': res.json()['active']}
+            is_sysadmin=is_allowed(
+                res.json()['identity']['traits']['username'],
+                'administration:system',
+                action='create'
+            )
+
+            print(is_sysadmin)
+
+            return {
+                'active': res.json()['active'],
+                'traits': res.json()['identity']['traits']
+            }
         elif res.json() and 'active' not in res.json():
             abort(500)
         
@@ -247,7 +280,7 @@ def whoami():
         logging.error('Connection error when connecting with Kratos service')
         abort(500)
     except KeyError:
-        logging.error('active key not found.')
+        logging.error('key not found.')
         abort(500)
     except Timeout:
         logging.error('')
