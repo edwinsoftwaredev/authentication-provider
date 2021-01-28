@@ -56,9 +56,9 @@ const Menu: React.FC = () => {
     window.location.href =  redir ? redir : '';
   };
 
-  const handleHomeClick = () => {
-    history.push('/');
-  };
+  const handleRoute = (route: string) => {
+    history.push(route);
+  }
 
   const handleOverlayClick = () => {
     if (appContext.isDrawerOpen) {
@@ -85,10 +85,16 @@ const Menu: React.FC = () => {
         {
           appContext.user.active === WhoAmIStatus.Active ? (
             <div>
-              <li className={style['item']} onClick={handleHomeClick}>
+              <li className={style['item']} onClick={e => handleRoute('/')}>
                 <div className={style['item-icon']}>
                   <i className='bx bx-home-alt'></i>
                   Home
+                </div>
+              </li>
+              <li className={style['item']} onClick={e => handleRoute('/clients')}>
+                <div className={style['item-icon']}>
+                  <i className='bx bx-windows' />
+                  Clients
                 </div>
               </li>
               <li className={style['item']} onClick={handleSettingsClick}>
